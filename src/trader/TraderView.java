@@ -4,6 +4,7 @@
 
 package trader;
 
+import java.util.TreeMap;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -18,6 +19,7 @@ import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import quote.Prices;
 
 /**
  * The application's main frame.
@@ -216,11 +218,13 @@ public class TraderView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        try {
-            jInternalFrame1.setQuoteData("LLOY.L");
-        } catch (ParseException ex) {
-            Logger.getLogger(TraderView.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        jInternalFrame1.drawQuote("LLOY.L",new quote.source.Yahoo());
+        
+//        try {
+//            jInternalFrame1.setQuoteData("LLOY.L");
+//        } catch (ParseException ex) {
+//            Logger.getLogger(TraderView.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

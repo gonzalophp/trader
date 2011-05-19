@@ -19,18 +19,33 @@ import quote.Prices;
  * @author fiber
  */
 public class JInternalFrame extends javax.swing.JInternalFrame {
-
+    
+    quote.HistoricalData historicalData = new quote.HistoricalData();
+    
     /** Creates new form JInternalFrame */
     public JInternalFrame() {
         initComponents();
     }
     
-    public void setQuoteData(String quoteTicket) throws ParseException{
-        setVisible(true);
-        yahoo.QuoteReader quoteReader = new yahoo.QuoteReader();
-        TreeMap<Long, Prices> historicalData = quoteReader.getHistoricalData(quoteTicket);
-        jPanel1.setHistoricalData(historicalData);
+    public void drawQuote(String ticketQuote, quote.source.PriceReader dataSource){
+        historicalData.loadPrices(ticketQuote, dataSource);
+        try {
+            TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
+            jPanel1.setGraphPrices(graphPrices);
+            setVisible(true);
+        }
+        catch(Exception e){
+            System.out.println("Error getting prices");
+        }
     }
+    
+//    public void setQuoteData(String quoteTicket) throws ParseException{
+//        setVisible(true);
+//        
+//        yahoo.QuoteReader quoteReader = new yahoo.QuoteReader();
+//        TreeMap<Long, Prices> historicalData = quoteReader.getHistoricalData(quoteTicket);
+//        jPanel1.setHistoricalData(historicalData);
+//    }
 
     /** This method is called from within the constructor to
      * initialize the form.

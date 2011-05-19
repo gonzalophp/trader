@@ -23,8 +23,11 @@ import quote.Prices;
  * @author fiber
  */
 public class JPanel extends javax.swing.JPanel {
-    private TreeMap<Long, Prices> historicalData;
+//    private quote.HistoricalData historicalData;
+    private TreeMap<Long, Prices> graphPrices;
     private boolean dataSet;
+    
+    
     /** Creates new form JPanel */
     public JPanel() {
         dataSet = false;
@@ -37,31 +40,32 @@ public class JPanel extends javax.swing.JPanel {
         if (dataSet) _paintPrices(g);
     }
     
-    public void setHistoricalData(TreeMap<Long, Prices> historicalData){
-        this.historicalData = historicalData;
+    public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
+        this.graphPrices = graphPrices;
         dataSet = true;
     }
     
     private void _paintPrices(Graphics g){
+        
         long panelSizeY = getHeight();
         long panelSizeX = getWidth()+300;
         
-        long minDataX    = historicalData.firstKey();
-        long maxDataX    = historicalData.lastKey();
+        long minDataX    = graphPrices.firstKey();
+        long maxDataX    = graphPrices.lastKey();
         
         Double minDataY=0.0;
         Double maxDataY=0.0;
         
-        Set<Long> setDate = historicalData.keySet();
+        Set<Long> setDate = graphPrices.keySet();
         Iterator<Long> longIterator = setDate.iterator();
         
         if (longIterator.hasNext()){
-            Prices prices = historicalData.get(longIterator.next());
+            Prices prices = graphPrices.get(longIterator.next());
             minDataY = maxDataY = prices.getAdjClose();
         }
                 
         while(longIterator.hasNext()){
-            Prices prices = historicalData.get(longIterator.next());
+            Prices prices = graphPrices.get(longIterator.next());
             if (prices.getAdjClose() < minDataY){
                 minDataY = prices.getAdjClose();
             }
@@ -80,7 +84,7 @@ public class JPanel extends javax.swing.JPanel {
             Long dataX;
             Double dataY;
             dataX = longIterator.next();
-            dataY = historicalData.get(dataX).getAdjClose();
+            dataY = graphPrices.get(dataX).getAdjClose();
             
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(dataX);
