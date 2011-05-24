@@ -28,7 +28,8 @@ public class JPanel extends javax.swing.JPanel {
 //    private quote.HistoricalData historicalData;
     private TreeMap<Long, Prices> graphPrices;
     private boolean dataSet;
-    
+    private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
+    private int hiddenPixels;
     
     /** Creates new form JPanel */
     public JPanel() {
@@ -42,20 +43,26 @@ public class JPanel extends javax.swing.JPanel {
         if (dataSet) _paintPrices(g);
     }
     
-    public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
+    public int setGraphPrices(TreeMap<Long, Prices> graphPrices){
+        hiddenPixels = graphPrices.size()-getWidth()-marginLeft-marginRight;
         this.graphPrices = graphPrices;
         dataSet = true;
+        System.out.println(hiddenPixels);
+        return hiddenPixels;
+    }
+    
+    public void setHiddenPixels(int hiddenPixels){
+        this.hiddenPixels = hiddenPixels;
+        repaint();
     }
     
     private void _paintPrices(Graphics g){
-        int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
         long panelSizeX = getWidth()-marginLeft-marginRight; //size for scale legend
         long panelSizeY = getHeight()-marginTop-marginBotton; //size for scale legend
 
         g.drawRect(marginLeft, marginTop, (int)panelSizeX, (int)panelSizeY);
         
-        long i=0
-            ,hiddenPixels = graphPrices.size()-panelSizeX;
+        long i=0;
         
         if (hiddenPixels > 0){
             Double y=0.0
@@ -73,6 +80,7 @@ public class JPanel extends javax.swing.JPanel {
                     minY = y;
                     maxY = y;
                 }
+                if ((i-hiddenPixels) > panelSizeX ) break;
             }
             
             Double deltaY=maxY-minY;
@@ -83,9 +91,10 @@ public class JPanel extends javax.swing.JPanel {
                 if (i++ >= hiddenPixels) {
                     x = (int)(i-hiddenPixels)+marginLeft;
                     y = (panelSizeY*(maxY-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop;
-                    System.out.println("x:"+x+" i:"+i+" hiddenPixels:"+hiddenPixels);
+//                    System.out.println("x:"+x+" i:"+i+" hiddenPixels:"+hiddenPixels);
                     alPoints.add(new Point(x, y.intValue()));
                 }
+                if ((i-hiddenPixels) > panelSizeX ) break;
             }
             
             Point previousPoint=null;

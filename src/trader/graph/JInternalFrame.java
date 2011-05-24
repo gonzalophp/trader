@@ -31,7 +31,9 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         historicalData.loadPrices(ticketQuote, dataSource);
         try {
             TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
-            jPanel1.setGraphPrices(graphPrices);
+            int hiddenPixels = jPanel1.setGraphPrices(graphPrices);
+            jScrollBar1.setMaximum(hiddenPixels);
+            jScrollBar1.setValue(hiddenPixels);
             setVisible(true);
         }
         catch(Exception e){
@@ -78,6 +80,11 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         jScrollBar1.setValue(100);
         jScrollBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jScrollBar1.setName("jScrollBar1"); // NOI18N
+        jScrollBar1.addAdjustmentListener(new java.awt.event.AdjustmentListener() {
+            public void adjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {
+                jScrollBar1AdjustmentValueChanged(evt);
+            }
+        });
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(trader.TraderApp.class).getContext().getResourceMap(JInternalFrame.class);
         jToggleButton1.setIcon(resourceMap.getIcon("jToggleButton1.icon")); // NOI18N
@@ -120,7 +127,7 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -131,6 +138,11 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jScrollBar1AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBar1AdjustmentValueChanged
+        jPanel1.setHiddenPixels(jScrollBar1.getValue());
+    }//GEN-LAST:event_jScrollBar1AdjustmentValueChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
     private trader.graph.JPanel jPanel1;
