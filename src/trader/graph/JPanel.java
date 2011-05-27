@@ -31,7 +31,7 @@ public class JPanel extends javax.swing.JPanel {
     private boolean dataSet;
     private int firstDrawPoint;
     private Double scale=1.0;
-    private long graphSizeX; //size for scale legend
+    private Long graphSizeX; //size for scale legend
     private long graphSizeY; //size for scale legend
     
     /** Creates new form JPanel */
@@ -56,24 +56,38 @@ public class JPanel extends javax.swing.JPanel {
     
     public int zoomPlus(){
         System.out.println("plus");
-        scale *= 2;
-        firstDrawPoint += (graphSizeX/2);
-//        graphSizeX *= 2;
-        repaint();
+        Double ratioDataPixels;
+        ratioDataPixels = (graphSizeX.doubleValue() / (getWidth()-marginLeft-marginRight));
+        
+        if (ratioDataPixels > 0.1){
+            scale *= 2;
+            firstDrawPoint += (graphSizeX/2);
+            repaint();
+        }
+        
         return firstDrawPoint;
     }
     
     public int zoomMinus(){
         System.out.println("minus");
-        scale /= 2;
-        firstDrawPoint -= graphSizeX;
-//        graphSizeX /= 2;
+        
+        if (firstDrawPoint < graphSizeX){
+            scale = new Double(getWidth()-marginLeft-marginRight)/(graphPrices.size());
+            firstDrawPoint = 1;
+        }
+        else {
+            scale /= 2;
+            firstDrawPoint -= graphSizeX;
+        }
+        
         repaint();
+        
         return firstDrawPoint;
     }
     
     private void _paintPrices(Graphics g){
-        graphSizeX = (int)((getWidth()-marginLeft-marginRight)/scale); //size for scale legend
+        Double graphSizeXDouble = ((getWidth()-marginLeft-marginRight)/scale); //size for scale legend
+        graphSizeX = graphSizeXDouble.longValue();
         
         long totalPoints = graphPrices.size();
         System.out.println("totalPoints:"+totalPoints+" hiddenPoints:"+firstDrawPoint+" graphSizeX:"+graphSizeX);
