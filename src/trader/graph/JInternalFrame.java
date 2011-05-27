@@ -30,24 +30,18 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
     public void drawQuote(String ticketQuote, quote.source.PriceReader dataSource){
         historicalData.loadPrices(ticketQuote, dataSource);
         try {
-            TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
-            int hiddenPixels = jPanel1.setGraphPrices(graphPrices);
-            jScrollBar1.setMaximum(hiddenPixels);
-            jScrollBar1.setValue(hiddenPixels);
             setVisible(true);
+            TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
+            int hiddenPoints = jPanel1.setGraphPrices(graphPrices);
+            jScrollBar1.setMaximum(hiddenPoints);
+            jScrollBar1.setValue(hiddenPoints);
+            jScrollBar1.setVisibleAmount(100);
         }
         catch(Exception e){
             System.out.println("Error getting prices");
         }
     }
-    
-//    public void setQuoteData(String quoteTicket) throws ParseException{
-//        setVisible(true);
-//        
-//        yahoo.QuoteReader quoteReader = new yahoo.QuoteReader();
-//        TreeMap<Long, Prices> historicalData = quoteReader.getHistoricalData(quoteTicket);
-//        jPanel1.setHistoricalData(historicalData);
-//    }
+
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -95,6 +89,11 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         jToggleButton1.setContentAreaFilled(false);
         jToggleButton1.setName("jToggleButton1"); // NOI18N
         jToggleButton1.setRequestFocusEnabled(false);
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
 
         jToggleButton2.setIcon(resourceMap.getIcon("jToggleButton2.icon")); // NOI18N
         jToggleButton2.setSelected(true);
@@ -103,6 +102,11 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         jToggleButton2.setContentAreaFilled(false);
         jToggleButton2.setName("jToggleButton2"); // NOI18N
         jToggleButton2.setRequestFocusEnabled(false);
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -127,7 +131,7 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -140,8 +144,27 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jScrollBar1AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBar1AdjustmentValueChanged
-        jPanel1.setHiddenPixels(jScrollBar1.getValue());
+//        jPanel1.setHiddenPoints(jScrollBar1.getValue());
+//        repaint();
     }//GEN-LAST:event_jScrollBar1AdjustmentValueChanged
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        int hiddenPoints = jPanel1.zoomMinus();
+        jScrollBar1.setValue((int)(jScrollBar1.getValue()*0.5));
+        jScrollBar1.setMaximum((int)(jScrollBar1.getMaximum()*0.5));
+        jScrollBar1.setVisibleAmount(100);
+//        jPanel1.setHiddenPoints(hiddenPoints);
+        repaint();
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        int hiddenPoints = jPanel1.zoomPlus();
+        jScrollBar1.setValue((int)(jScrollBar1.getValue()*2));
+        jScrollBar1.setMaximum((int)(jScrollBar1.getMaximum()*2));
+        jScrollBar1.setVisibleAmount(100);
+//        jPanel1.setHiddenPoints(hiddenPoints);
+        repaint();
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;

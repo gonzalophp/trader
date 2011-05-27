@@ -25,11 +25,14 @@ import quote.Prices;
  * @author fiber
  */
 public class JPanel extends javax.swing.JPanel {
-//    private quote.HistoricalData historicalData;
+    private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
+    
     private TreeMap<Long, Prices> graphPrices;
     private boolean dataSet;
-    private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
-    private int hiddenPixels;
+    private int firstDrawPoint;
+    private Double scale=1.0;
+    private long graphSizeX; //size for scale legend
+    private long graphSizeY; //size for scale legend
     
     /** Creates new form JPanel */
     public JPanel() {
@@ -44,57 +47,73 @@ public class JPanel extends javax.swing.JPanel {
     }
     
     public int setGraphPrices(TreeMap<Long, Prices> graphPrices){
-        hiddenPixels = graphPrices.size()-getWidth()-marginLeft-marginRight;
+        firstDrawPoint = (int) ((scale)*(graphPrices.size()-getWidth()+marginLeft+marginRight));
         this.graphPrices = graphPrices;
         dataSet = true;
-        System.out.println(hiddenPixels);
-        return hiddenPixels;
+        System.out.println("hiddenPoints:"+firstDrawPoint+" graphPrices.size():"+graphPrices.size()+" getWidth():"+getWidth()+" marginLeft:"+marginLeft+" marginRight:"+marginRight);
+        return firstDrawPoint;
     }
     
-    public void setHiddenPixels(int hiddenPixels){
-        this.hiddenPixels = hiddenPixels;
+    public int zoomPlus(){
+        System.out.println("plus");
+        scale *= 2;
+        firstDrawPoint += (graphSizeX/2);
+//        graphSizeX *= 2;
         repaint();
+        return firstDrawPoint;
+    }
+    
+    public int zoomMinus(){
+        System.out.println("minus");
+        scale /= 2;
+        firstDrawPoint -= graphSizeX;
+//        graphSizeX /= 2;
+        repaint();
+        return firstDrawPoint;
     }
     
     private void _paintPrices(Graphics g){
-        long panelSizeX = getWidth()-marginLeft-marginRight; //size for scale legend
-        long panelSizeY = getHeight()-marginTop-marginBotton; //size for scale legend
-
-        g.drawRect(marginLeft, marginTop, (int)panelSizeX, (int)panelSizeY);
+        graphSizeX = (int)((getWidth()-marginLeft-marginRight)/scale); //size for scale legend
+        
+        long totalPoints = graphPrices.size();
+        System.out.println("totalPoints:"+totalPoints+" hiddenPoints:"+firstDrawPoint+" graphSizeX:"+graphSizeX);
+        graphSizeY = getHeight()-marginTop-marginBotton; //size for scale legend
+//        System.out.println("graphSizeX4:"+graphSizeX+" graphSizeY:"+graphSizeY+" getHeight()"+getHeight());
+        g.drawRect(marginLeft, marginTop, (int)(graphSizeX*scale), (int)graphSizeY);
         
         long i=0;
         
-        if (hiddenPixels > 0){
+        if (firstDrawPoint > 0){
             Double y=0.0
                     ,maxY=0.0
                     ,minY=0.0;
             
             for(long  longTimeMillis: graphPrices.keySet()){
-                if (i++ > hiddenPixels) {
+                if (i++ > firstDrawPoint) {
                     y = graphPrices.get(longTimeMillis).getAdjClose();
                     if (y>maxY) maxY=y;
                     else if(y<minY) minY = y;
                 }
-                else if (i == hiddenPixels) {
+                else if (i == firstDrawPoint) {
                     y = graphPrices.get(longTimeMillis).getAdjClose();
                     minY = y;
                     maxY = y;
                 }
-                if ((i-hiddenPixels) > panelSizeX ) break;
+                if ((i-firstDrawPoint) >= (graphSizeX) ) break;
             }
             
             Double deltaY=maxY-minY;
             ArrayList<Point> alPoints = new ArrayList<Point>();
             i=0;
-            int x;
+            int x=0;
             for(long  longTimeMillis: graphPrices.keySet()){
-                if (i++ >= hiddenPixels) {
-                    x = (int)(i-hiddenPixels)+marginLeft;
-                    y = (panelSizeY*(maxY-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop;
-//                    System.out.println("x:"+x+" i:"+i+" hiddenPixels:"+hiddenPixels);
+                if (i++ >= firstDrawPoint) {
+                    x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
+                    y = (graphSizeY*(maxY-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop;
                     alPoints.add(new Point(x, y.intValue()));
                 }
-                if ((i-hiddenPixels) > panelSizeX ) break;
+                if ((i-firstDrawPoint) >= graphSizeX ) break;
+//                System.out.println("i:"+i+" x:"+x+" y:"+y+" scale:"+scale+" hiddenPoints:"+hiddenPoints+" graphSizeX:"+graphSizeX);
             }
             
             Point previousPoint=null;
@@ -105,133 +124,6 @@ public class JPanel extends javax.swing.JPanel {
                 previousPoint = point;
             }
         }
-        
-        
-        
-//        graphPrices.keySet().
-//        
-//        
-//        
-//        
-//        if (graphPricesSize > panelSizeX){ // More data than pixels
-//            long firstLongTimeMillis=graphPrices.firstKey()
-//                , i=0
-//                , hiddenPixels = graphPricesSize-panelSizeX;
-//            
-//            for(long  longTimeMillis: graphPrices.keySet()){
-//                if (i++ == hiddenPixels) {
-//                    firstLongTimeMillis = longTimeMillis;
-//                    break;
-//                }
-//            }
-//            System.out.println(firstLongTimeMillis);
-//            
-////            Set<Long> setLongTimeMillis = graphPrices.keySet();
-////            Iterator iLongTimeMillis = setLongTimeMillis.iterator();
-////            long longTimeMillis;
-////            long hiddenPixels = graphPrices.size()-panelSizeX;
-////            for(long i=0;i<hiddenPixels;i++) iLongTimeMillis.next();
-////                
-////            while(iLongTimeMillis.hasNext()){
-////                longTimeMillis = (long)iLongTimeMillis.next();
-////            }
-////            
-////            graphPrices.
-//            System.out.println("eo");
-//        }
-//    }
-//    
-//    private void _paintPrices2(Graphics g){
-//        
-//        long panelSizeY = getHeight();
-//        long panelSizeX = getWidth();
-//        
-//        long minDataX    = graphPrices.firstKey();
-//        long maxDataX    = graphPrices.lastKey();
-//        
-//        Double minDataY=0.0;
-//        Double maxDataY=0.0;
-//        
-//        Set<Long> setDate = graphPrices.keySet();
-//        Iterator<Long> longIterator = setDate.iterator();
-//        
-//        if (longIterator.hasNext()){
-//            Prices prices = graphPrices.get(longIterator.next());
-//            minDataY = maxDataY = prices.getAdjClose();
-//        }
-//                
-//        while(longIterator.hasNext()){
-//            Prices prices = graphPrices.get(longIterator.next());
-//            if (prices.getAdjClose() < minDataY){
-//                minDataY = prices.getAdjClose();
-//            }
-//            else if(prices.getAdjClose() > maxDataY){
-//                maxDataY = prices.getAdjClose();
-//            }
-//        }
-//        
-//        long dataSizeX = maxDataX-minDataX;
-//        Double dataSizeY = maxDataY-minDataY;
-//            
-//        longIterator = setDate.iterator();
-//        
-//        TreeMap<Integer,ArrayList<Integer>> alGraphValues = new TreeMap<Integer,ArrayList<Integer>>();
-//        while(longIterator.hasNext()){
-//            Long dataX;
-//            Double dataY;
-//            dataX = longIterator.next();
-//            dataY = graphPrices.get(dataX).getAdjClose();
-//            
-//            Calendar cal = Calendar.getInstance();
-//            cal.setTimeInMillis(dataX);
-//            System.out.println(dataX+" "+cal.get(Calendar.DAY_OF_WEEK));
-//            
-//            int graphX,graphY;
-//            graphX = (int)(panelSizeX-(panelSizeX*((double)(maxDataX-dataX)/dataSizeX)));
-//            graphY = (int)(panelSizeY-(panelSizeY*(((double)(maxDataY-dataY)/dataSizeY))));
-//            
-//            if (alGraphValues.containsKey(graphX)){
-//                alGraphValues.get(graphX).add(graphY);
-//            }
-//            else {
-//                ArrayList<Integer> alInteger = new ArrayList<Integer>();
-//                alInteger.add(graphY);
-//                alGraphValues.put(graphX, alInteger);
-//            }
-//        }
-//        
-//        Set<Integer> setGraph = alGraphValues.keySet();
-//        Iterator<Integer> iIterator = setGraph.iterator();
-//        int x=0,y=0;
-//        TreeMap<Integer,Integer> alGraphPoints = new TreeMap<Integer,Integer>();
-//        while(iIterator.hasNext()){
-//            x = iIterator.next();
-//            if (alGraphValues.get(x).size() > 1){
-//                ArrayList<Integer> alInteger = new ArrayList<Integer>();
-//                alInteger = alGraphValues.get(x);
-//                
-//                Iterator iIterator2 =  alInteger.iterator();
-//                y=0;
-//                while (iIterator2.hasNext()) y += (Integer)iIterator2.next();
-//                y = y/alInteger.size();
-//            }
-//            else {
-//                y = alGraphValues.get(x).get(0);
-//            }
-//            alGraphPoints.put(x, y);
-//        }
-//        
-//        setGraph = alGraphPoints.keySet();
-//        iIterator = setGraph.iterator();
-//        int i = 0, previousX = 0, previousY = 0;
-//        while(iIterator.hasNext()){
-//            x=iIterator.next();
-//            if (i++>0){
-//                g.drawLine(previousX,previousY,x,alGraphPoints.get(x));
-//            }
-//            previousX = x;
-//            previousY = alGraphPoints.get(x);
-//        }
     }
 
     /** This method is called from within the constructor to
