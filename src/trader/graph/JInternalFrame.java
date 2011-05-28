@@ -32,10 +32,15 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         try {
             setVisible(true);
             TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
-            int hiddenPoints = jPanel1.setGraphPrices(graphPrices);
-            jScrollBar1.setMaximum(hiddenPoints);
-            jScrollBar1.setValue(hiddenPoints);
-            jScrollBar1.setVisibleAmount(100);
+            jPanel1.setGraphPrices(graphPrices);
+            
+            int graphSizeX = jPanel1.getWidth()-jPanel1.getMarginLeft()-jPanel1.getMarginRight();
+            int jScrollBarExtent = (int) (graphPrices.size()*(new Double(graphSizeX)/graphPrices.size()));
+            int jScrollBarValue = (graphPrices.size()-graphSizeX);
+            jScrollBar1.setValues(jScrollBarValue
+                    , jScrollBarExtent
+                    , 1
+                    , graphPrices.size());
         }
         catch(Exception e){
             System.out.println("Error getting prices");
@@ -144,26 +149,17 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jScrollBar1AdjustmentValueChanged(java.awt.event.AdjustmentEvent evt) {//GEN-FIRST:event_jScrollBar1AdjustmentValueChanged
-//        jPanel1.setHiddenPoints(jScrollBar1.getValue());
-//        repaint();
+        jPanel1.setFirstDrawPoint(jScrollBar1.getValue());
     }//GEN-LAST:event_jScrollBar1AdjustmentValueChanged
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        int hiddenPoints = jPanel1.zoomMinus();
-        jScrollBar1.setValue((int)(jScrollBar1.getValue()*0.5));
-        jScrollBar1.setMaximum((int)(jScrollBar1.getMaximum()*0.5));
-        jScrollBar1.setVisibleAmount(100);
-//        jPanel1.setHiddenPoints(hiddenPoints);
-        repaint();
+        jScrollBar1.setValue(jPanel1.zoomMinus());
+        jScrollBar1.setVisibleAmount(jScrollBar1.getVisibleAmount()*2);
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
-        int hiddenPoints = jPanel1.zoomPlus();
-        jScrollBar1.setValue((int)(jScrollBar1.getValue()*2));
-        jScrollBar1.setMaximum((int)(jScrollBar1.getMaximum()*2));
-        jScrollBar1.setVisibleAmount(100);
-//        jPanel1.setHiddenPoints(hiddenPoints);
-        repaint();
+        jScrollBar1.setVisibleAmount(jScrollBar1.getVisibleAmount()/2);
+        jScrollBar1.setValue(jPanel1.zoomPlus());
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

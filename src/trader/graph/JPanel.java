@@ -14,9 +14,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
-import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeMap;
 import quote.Prices;
 
@@ -26,6 +23,14 @@ import quote.Prices;
  */
 public class JPanel extends javax.swing.JPanel {
     private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
+
+    public int getMarginLeft() {
+        return marginLeft;
+    }
+
+    public int getMarginRight() {
+        return marginRight;
+    }
     
     private TreeMap<Long, Prices> graphPrices;
     private boolean dataSet;
@@ -46,12 +51,17 @@ public class JPanel extends javax.swing.JPanel {
         if (dataSet) _paintPrices(g);
     }
     
-    public int setGraphPrices(TreeMap<Long, Prices> graphPrices){
-        firstDrawPoint = (int) ((scale)*(graphPrices.size()-getWidth()+marginLeft+marginRight));
+    public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
+//        firstDrawPoint = (int) ((scale)*(graphPrices.size()-getWidth()+marginLeft+marginRight));
         this.graphPrices = graphPrices;
         dataSet = true;
-        System.out.println("hiddenPoints:"+firstDrawPoint+" graphPrices.size():"+graphPrices.size()+" getWidth():"+getWidth()+" marginLeft:"+marginLeft+" marginRight:"+marginRight);
-        return firstDrawPoint;
+//        System.out.println("hiddenPoints:"+firstDrawPoint+" graphPrices.size():"+graphPrices.size()+" getWidth():"+getWidth()+" marginLeft:"+marginLeft+" marginRight:"+marginRight);
+//        return firstDrawPoint;
+    }
+    
+    public void setFirstDrawPoint(int firstDrawPoint){
+        this.firstDrawPoint = firstDrawPoint;
+        repaint();
     }
     
     public int zoomPlus(){
