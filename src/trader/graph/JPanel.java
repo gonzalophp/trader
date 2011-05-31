@@ -15,6 +15,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TreeMap;
+import java.util.Vector;
 import quote.Prices;
 
 /**
@@ -23,7 +24,8 @@ import quote.Prices;
  */
 public class JPanel extends javax.swing.JPanel {
     private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
-
+    private int originalGraphSize;
+    
     public int getMarginLeft() {
         return marginLeft;
     }
@@ -36,7 +38,7 @@ public class JPanel extends javax.swing.JPanel {
     private boolean dataSet;
     private int firstDrawPoint;
     private Double scale=1.0;
-    private Long graphSizeX; //size for scale legend
+//    private Long graphSizeX; //size for scale legend
     private long graphSizeY; //size for scale legend
     
     /** Creates new form JPanel */
@@ -52,11 +54,8 @@ public class JPanel extends javax.swing.JPanel {
     }
     
     public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
-//        firstDrawPoint = (int) ((scale)*(graphPrices.size()-getWidth()+marginLeft+marginRight));
         this.graphPrices = graphPrices;
         dataSet = true;
-//        System.out.println("hiddenPoints:"+firstDrawPoint+" graphPrices.size():"+graphPrices.size()+" getWidth():"+getWidth()+" marginLeft:"+marginLeft+" marginRight:"+marginRight);
-//        return firstDrawPoint;
     }
     
     public void setFirstDrawPoint(int firstDrawPoint){
@@ -66,10 +65,10 @@ public class JPanel extends javax.swing.JPanel {
     
     public int zoomPlus(){
         System.out.println("plus");
+        int graphSizeX = getGraphSizeX();
         Double ratioDataPixels;
-        ratioDataPixels = (graphSizeX.doubleValue() / (getWidth()-marginLeft-marginRight));
-        
-        if (ratioDataPixels > 0.1){
+        ratioDataPixels = (new Double(graphSizeX) / (getWidth()-marginLeft-marginRight));
+        if (ratioDataPixels > 0.2){
             scale *= 2;
             firstDrawPoint += (graphSizeX/2);
             repaint();
@@ -80,7 +79,7 @@ public class JPanel extends javax.swing.JPanel {
     
     public int zoomMinus(){
         System.out.println("minus");
-        
+        int graphSizeX = getGraphSizeX();
         if (firstDrawPoint < graphSizeX){
             scale = new Double(getWidth()-marginLeft-marginRight)/(graphPrices.size());
             firstDrawPoint = 1;
@@ -95,15 +94,19 @@ public class JPanel extends javax.swing.JPanel {
         return firstDrawPoint;
     }
     
-    private void _paintPrices(Graphics g){
+    public int getGraphSizeX(){
         Double graphSizeXDouble = ((getWidth()-marginLeft-marginRight)/scale); //size for scale legend
-        graphSizeX = graphSizeXDouble.longValue();
+        return graphSizeXDouble.intValue();
+    }
+    
+    private void _paintPrices(Graphics g){
+        int graphSizeX = getGraphSizeX();
+        if (originalGraphSize == 0) originalGraphSize=graphSizeX;
         
         long totalPoints = graphPrices.size();
         System.out.println("totalPoints:"+totalPoints+" hiddenPoints:"+firstDrawPoint+" graphSizeX:"+graphSizeX);
         graphSizeY = getHeight()-marginTop-marginBotton; //size for scale legend
-//        System.out.println("graphSizeX4:"+graphSizeX+" graphSizeY:"+graphSizeY+" getHeight()"+getHeight());
-        g.drawRect(marginLeft, marginTop, (int)(graphSizeX*scale), (int)graphSizeY);
+        g.drawRect(marginLeft, marginTop, originalGraphSize, (int)graphSizeY);
         
         long i=0;
         
@@ -137,7 +140,6 @@ public class JPanel extends javax.swing.JPanel {
                     alPoints.add(new Point(x, y.intValue()));
                 }
                 if ((i-firstDrawPoint) >= graphSizeX ) break;
-//                System.out.println("i:"+i+" x:"+x+" y:"+y+" scale:"+scale+" hiddenPoints:"+hiddenPoints+" graphSizeX:"+graphSizeX);
             }
             
             Point previousPoint=null;

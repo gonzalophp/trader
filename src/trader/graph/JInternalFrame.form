@@ -50,7 +50,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jComboBox1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jPanel1" pref="331" max="32767" attributes="0"/>
+              <Component id="jPanel1" pref="335" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="jScrollBar1" max="32767" attributes="1"/>
@@ -98,7 +98,6 @@
     <Component class="javax.swing.JToggleButton" name="jToggleButton1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" resourceKey="jToggleButton1.icon"/>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" resourceKey="jToggleButton1.text"/>
         <Property name="alignmentY" type="float" value="0.0"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -106,6 +105,7 @@
             <EtchetBorder/>
           </Border>
         </Property>
+        <Property name="borderPainted" type="boolean" value="false"/>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="jToggleButton1" noResource="true"/>
         <Property name="requestFocusEnabled" type="boolean" value="false"/>
@@ -117,14 +117,14 @@
     <Component class="javax.swing.JToggleButton" name="jToggleButton2">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" resourceKey="jToggleButton2.icon"/>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="alignmentY" type="float" value="0.0"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-            <EtchetBorder/>
-          </Border>
+          <Border info="null"/>
         </Property>
         <Property name="contentAreaFilled" type="boolean" value="false"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Default Cursor"/>
+        </Property>
         <Property name="name" type="java.lang.String" value="jToggleButton2" noResource="true"/>
         <Property name="requestFocusEnabled" type="boolean" value="false"/>
       </Properties>

@@ -87,10 +87,10 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(trader.TraderApp.class).getContext().getResourceMap(JInternalFrame.class);
         jToggleButton1.setIcon(resourceMap.getIcon("jToggleButton1.icon")); // NOI18N
-        jToggleButton1.setSelected(true);
         jToggleButton1.setText(resourceMap.getString("jToggleButton1.text")); // NOI18N
         jToggleButton1.setAlignmentY(0.0F);
         jToggleButton1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jToggleButton1.setBorderPainted(false);
         jToggleButton1.setContentAreaFilled(false);
         jToggleButton1.setName("jToggleButton1"); // NOI18N
         jToggleButton1.setRequestFocusEnabled(false);
@@ -101,10 +101,10 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         });
 
         jToggleButton2.setIcon(resourceMap.getIcon("jToggleButton2.icon")); // NOI18N
-        jToggleButton2.setSelected(true);
         jToggleButton2.setAlignmentY(0.0F);
-        jToggleButton2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jToggleButton2.setBorder(null);
         jToggleButton2.setContentAreaFilled(false);
+        jToggleButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jToggleButton2.setName("jToggleButton2"); // NOI18N
         jToggleButton2.setRequestFocusEnabled(false);
         jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -136,7 +136,7 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -153,13 +153,16 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jScrollBar1AdjustmentValueChanged
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        jScrollBar1.setVisibleAmount(0);
         jScrollBar1.setValue(jPanel1.zoomMinus());
-        jScrollBar1.setVisibleAmount(jScrollBar1.getVisibleAmount()*2);
+        jScrollBar1.setVisibleAmount(jPanel1.getGraphSizeX());
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
-        jScrollBar1.setVisibleAmount(jScrollBar1.getVisibleAmount()/2);
+        jScrollBar1.setVisibleAmount(0);
         jScrollBar1.setValue(jPanel1.zoomPlus());
+        jScrollBar1.setVisibleAmount(jPanel1.getGraphSizeX());
+        
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
