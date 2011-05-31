@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TreeMap;
 import java.util.Vector;
+import javax.swing.SwingUtilities;
 import quote.Prices;
 
 /**
@@ -25,6 +26,8 @@ import quote.Prices;
 public class JPanel extends javax.swing.JPanel {
     private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
     private int originalGraphSize;
+    private int mouseClickX=-1;
+    private int lastMouseDragX=-1;
     
     public int getMarginLeft() {
         return marginLeft;
@@ -104,7 +107,7 @@ public class JPanel extends javax.swing.JPanel {
         if (originalGraphSize == 0) originalGraphSize=graphSizeX;
         
         long totalPoints = graphPrices.size();
-        System.out.println("totalPoints:"+totalPoints+" hiddenPoints:"+firstDrawPoint+" graphSizeX:"+graphSizeX);
+//        System.out.println("totalPoints:"+totalPoints+" hiddenPoints:"+firstDrawPoint+" graphSizeX:"+graphSizeX);
         graphSizeY = getHeight()-marginTop-marginBotton; //size for scale legend
         g.drawRect(marginLeft, marginTop, originalGraphSize, (int)graphSizeY);
         
@@ -163,6 +166,19 @@ public class JPanel extends javax.swing.JPanel {
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
         setName("Form"); // NOI18N
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                formMouseReleased(evt);
+            }
+        });
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -175,6 +191,30 @@ public class JPanel extends javax.swing.JPanel {
             .addGap(0, 296, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
+        lastMouseDragX = -1;
+    }//GEN-LAST:event_formMouseReleased
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        lastMouseDragX = evt.getX();
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+            int newFirstDrawPoint = firstDrawPoint+lastMouseDragX-evt.getX();
+            
+            if ((newFirstDrawPoint+getGraphSizeX())>graphPrices.size()){
+                newFirstDrawPoint = graphPrices.size()-getGraphSizeX();
+            }
+            if ((firstDrawPoint != newFirstDrawPoint) &&(newFirstDrawPoint>1)){
+                System.out.println("newFirstDrawPoint:"+newFirstDrawPoint+" firstDrawPoint:"+firstDrawPoint+" mouseClickX:"+mouseClickX+" evt.getX():"+evt.getX());
+                lastMouseDragX = evt.getX();
+                trader.graph.JInternalFrame jScrollBar = (trader.graph.JInternalFrame)getParent().getParent().getParent().getParent();
+                jScrollBar.getScrollBar().setValue(newFirstDrawPoint);
+                setFirstDrawPoint(newFirstDrawPoint);
+            }
+    }//GEN-LAST:event_formMouseDragged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

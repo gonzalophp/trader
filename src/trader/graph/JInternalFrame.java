@@ -12,6 +12,7 @@ package trader.graph;
 
 import java.text.ParseException;
 import java.util.TreeMap;
+import javax.swing.JScrollBar;
 import quote.Prices;
 
 /**
@@ -47,6 +48,9 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         }
     }
 
+    public JScrollBar getScrollBar(){
+        return jScrollBar1;
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
