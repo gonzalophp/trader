@@ -157,7 +157,6 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jScrollBar1AdjustmentValueChanged
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        jScrollBar1.setVisibleAmount(0);
         jScrollBar1.setValue(jPanel1.zoomMinus());
         jScrollBar1.setVisibleAmount(jPanel1.getGraphSizeX());
     }//GEN-LAST:event_jToggleButton1ActionPerformed

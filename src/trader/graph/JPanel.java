@@ -13,10 +13,7 @@ package trader.graph;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.TreeMap;
-import java.util.Vector;
-import javax.swing.SwingUtilities;
 import quote.Prices;
 
 /**
@@ -26,8 +23,10 @@ import quote.Prices;
 public class JPanel extends javax.swing.JPanel {
     private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
     private int originalGraphSize;
-    private int mouseClickX=-1;
     private int lastMouseDragX=-1;
+    private trader.graph.JInternalFrame jInternalFrame1;
+    private trader.graph.ScaleDraw scaleDraw;
+    private trader.graph.PricesDraw pricesDraw;
     
     public int getMarginLeft() {
         return marginLeft;
@@ -41,8 +40,6 @@ public class JPanel extends javax.swing.JPanel {
     private boolean dataSet;
     private int firstDrawPoint;
     private Double scale=1.0;
-//    private Long graphSizeX; //size for scale legend
-    private long graphSizeY; //size for scale legend
     
     /** Creates new form JPanel */
     public JPanel() {
@@ -53,11 +50,22 @@ public class JPanel extends javax.swing.JPanel {
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
-        if (dataSet) _paintPrices(g);
+        if (dataSet) {
+            if (!(scaleDraw instanceof ScaleDraw)){
+                pricesDraw = new PricesDraw(graphPrices);
+            }
+            pricesDraw.drawLine(g, getMarginLeft(), marginTop, getGraphSizeX(), getGraphSixeY(), scale, firstDrawPoint);
+            
+            if (!(scaleDraw instanceof ScaleDraw)){
+                scaleDraw = new ScaleDraw(marginLeft, marginTop, getGraphSizeX(), getGraphSixeY());
+            }
+            scaleDraw.drawScale(g);
+        }
     }
     
     public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
         this.graphPrices = graphPrices;
+        jInternalFrame1 = (trader.graph.JInternalFrame)getParentObject(this,"trader.graph.JInternalFrame");
         dataSet = true;
     }
     
@@ -67,10 +75,8 @@ public class JPanel extends javax.swing.JPanel {
     }
     
     public int zoomPlus(){
-        System.out.println("plus");
         int graphSizeX = getGraphSizeX();
-        Double ratioDataPixels;
-        ratioDataPixels = (new Double(graphSizeX) / (getWidth()-marginLeft-marginRight));
+        Double ratioDataPixels = (new Double(graphSizeX) / (getWidth()-marginLeft-marginRight));
         if (ratioDataPixels > 0.2){
             scale *= 2;
             firstDrawPoint += (graphSizeX/2);
@@ -81,7 +87,6 @@ public class JPanel extends javax.swing.JPanel {
     }
     
     public int zoomMinus(){
-        System.out.println("minus");
         int graphSizeX = getGraphSizeX();
         if (firstDrawPoint < graphSizeX){
             scale = new Double(getWidth()-marginLeft-marginRight)/(graphPrices.size());
@@ -102,59 +107,10 @@ public class JPanel extends javax.swing.JPanel {
         return graphSizeXDouble.intValue();
     }
     
-    private void _paintPrices(Graphics g){
-        int graphSizeX = getGraphSizeX();
-        if (originalGraphSize == 0) originalGraphSize=graphSizeX;
-        
-        long totalPoints = graphPrices.size();
-//        System.out.println("totalPoints:"+totalPoints+" hiddenPoints:"+firstDrawPoint+" graphSizeX:"+graphSizeX);
-        graphSizeY = getHeight()-marginTop-marginBotton; //size for scale legend
-        g.drawRect(marginLeft, marginTop, originalGraphSize, (int)graphSizeY);
-        
-        long i=0;
-        
-        if (firstDrawPoint > 0){
-            Double y=0.0
-                    ,maxY=0.0
-                    ,minY=0.0;
-            
-            for(long  longTimeMillis: graphPrices.keySet()){
-                if (i++ > firstDrawPoint) {
-                    y = graphPrices.get(longTimeMillis).getAdjClose();
-                    if (y>maxY) maxY=y;
-                    else if(y<minY) minY = y;
-                }
-                else if (i == firstDrawPoint) {
-                    y = graphPrices.get(longTimeMillis).getAdjClose();
-                    minY = y;
-                    maxY = y;
-                }
-                if ((i-firstDrawPoint) >= (graphSizeX) ) break;
-            }
-            
-            Double deltaY=maxY-minY;
-            ArrayList<Point> alPoints = new ArrayList<Point>();
-            i=0;
-            int x=0;
-            for(long  longTimeMillis: graphPrices.keySet()){
-                if (i++ >= firstDrawPoint) {
-                    x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
-                    y = (graphSizeY*(maxY-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop;
-                    alPoints.add(new Point(x, y.intValue()));
-                }
-                if ((i-firstDrawPoint) >= graphSizeX ) break;
-            }
-            
-            Point previousPoint=null;
-            for(Point point:alPoints){
-                if(previousPoint!=null){
-                    g.drawLine((int)previousPoint.getX(), (int)previousPoint.getY(), (int)point.getX(), (int)point.getY());
-                }
-                previousPoint = point;
-            }
-        }
+    public int getGraphSixeY(){
+        return getHeight()-marginTop-marginBotton;
     }
-
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -207,14 +163,20 @@ public class JPanel extends javax.swing.JPanel {
                 newFirstDrawPoint = graphPrices.size()-getGraphSizeX();
             }
             if ((firstDrawPoint != newFirstDrawPoint) &&(newFirstDrawPoint>1)){
-                System.out.println("newFirstDrawPoint:"+newFirstDrawPoint+" firstDrawPoint:"+firstDrawPoint+" mouseClickX:"+mouseClickX+" evt.getX():"+evt.getX());
                 lastMouseDragX = evt.getX();
-                trader.graph.JInternalFrame jScrollBar = (trader.graph.JInternalFrame)getParent().getParent().getParent().getParent();
-                jScrollBar.getScrollBar().setValue(newFirstDrawPoint);
+                jInternalFrame1.getScrollBar().setValue(newFirstDrawPoint);
                 setFirstDrawPoint(newFirstDrawPoint);
             }
     }//GEN-LAST:event_formMouseDragged
 
+    private java.awt.Component getParentObject(java.awt.Component component, String className){
+        try {
+            while(((component=component.getParent()) != null) && (!Class.forName(className).isInstance(component)));
+        } catch (ClassNotFoundException ex){}
+        
+        return component;
+        
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
