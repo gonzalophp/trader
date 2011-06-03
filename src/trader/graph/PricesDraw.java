@@ -154,19 +154,26 @@ public class PricesDraw {
             }
             
             CandleStickPoint previousCandleStickPoint=null;
+            Calendar previousCalendar = Calendar.getInstance();
+            Calendar calendar = Calendar.getInstance();
             for(CandleStickPoint candleStickpoint:alCandleStickPoints){
                 if(previousCandleStickPoint!=null){
+                    calendar.setTimeInMillis(candleStickpoint.getLongTimeMillis());
+                    if (calendar.get(Calendar.MONTH) != previousCalendar.get(Calendar.MONTH)){
+                        g.setColor(Color.lightGray);
+                        g.drawLine(candleStickpoint.getX(), marginTop, candleStickpoint.getX(), marginTop+graphSizeY);
+                    }
+                    
                     g.setColor(Color.black);
                     g.drawLine(candleStickpoint.getX(), candleStickpoint.getMinY(), candleStickpoint.getX(), candleStickpoint.getMaxY());
                     
-                    
                     g.setColor(((candleStickpoint.getCloseY()-previousCandleStickPoint.getCloseY()) < 0) ? Color.green : Color.red );
-                    
                     g.fillRect(candleStickpoint.getX()-1
                             , Math.min(previousCandleStickPoint.getCloseY(),candleStickpoint.getCloseY())
                             , 3
                             , Math.abs(candleStickpoint.getCloseY()-previousCandleStickPoint.getCloseY()));
                 }
+                previousCalendar.setTimeInMillis(candleStickpoint.getLongTimeMillis());
                 previousCandleStickPoint = candleStickpoint;
             }
         }
