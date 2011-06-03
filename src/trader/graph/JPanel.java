@@ -11,8 +11,6 @@
 package trader.graph;
 
 import java.awt.Graphics;
-import java.awt.Point;
-import java.util.ArrayList;
 import java.util.TreeMap;
 import quote.Prices;
 
@@ -21,25 +19,28 @@ import quote.Prices;
  * @author fiber
  */
 public class JPanel extends javax.swing.JPanel {
-    private final int marginTop=10,marginBotton=20,marginLeft=10,marginRight=30;
-    private int originalGraphSize;
+    private final int MARGIN_TOP    = 10
+                    ,MARGIN_BOTTOM  = 20
+                    ,MARGIN_LEFT    = 10
+                    ,MARGIN_RIGHT   = 30;
+    
     private int lastMouseDragX=-1;
     private trader.graph.JInternalFrame jInternalFrame1;
     private trader.graph.ScaleDraw scaleDraw;
     private trader.graph.PricesDraw pricesDraw;
     
     public int getMarginLeft() {
-        return marginLeft;
+        return MARGIN_LEFT;
     }
 
     public int getMarginRight() {
-        return marginRight;
+        return MARGIN_RIGHT;
     }
     
     private TreeMap<Long, Prices> graphPrices;
     private boolean dataSet;
     private int firstDrawPoint;
-    private Double scale=1.0;
+    private Double scale;
     
     /** Creates new form JPanel */
     public JPanel() {
@@ -51,22 +52,30 @@ public class JPanel extends javax.swing.JPanel {
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
         if (dataSet) {
-            if (!(scaleDraw instanceof ScaleDraw)){
-                pricesDraw = new PricesDraw(graphPrices);
-            }
-            pricesDraw.drawLine(g, getMarginLeft(), marginTop, getGraphSizeX(), getGraphSixeY(), scale, firstDrawPoint);
+            pricesDraw.draw(g, getMarginLeft(), MARGIN_TOP, getGraphSizeX(), getGraphSixeY(), scale, firstDrawPoint);
             
             if (!(scaleDraw instanceof ScaleDraw)){
-                scaleDraw = new ScaleDraw(marginLeft, marginTop, getGraphSizeX(), getGraphSixeY());
+                scaleDraw = new ScaleDraw(MARGIN_LEFT, MARGIN_TOP, (int)(getGraphSizeX()*scale), getGraphSixeY());
             }
             scaleDraw.drawScale(g);
         }
     }
     
-    public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
+    public void setGraphPrices(TreeMap<Long, Prices> graphPrices, int graphStyle){
         this.graphPrices = graphPrices;
         jInternalFrame1 = (trader.graph.JInternalFrame)getParentObject(this,"trader.graph.JInternalFrame");
         dataSet = true;
+        
+        pricesDraw = new PricesDraw(graphPrices,graphStyle);
+        switch (graphStyle) {
+            case PricesDraw.GRAPH_STYLE_LINE:
+                scale = 1.0;
+            break;
+            case PricesDraw.GRAPH_STYLE_CANDLESTICK:
+                scale = 3.0;
+                firstDrawPoint += getGraphSizeX()*2;
+            break;
+        }
     }
     
     public void setFirstDrawPoint(int firstDrawPoint){
@@ -76,7 +85,7 @@ public class JPanel extends javax.swing.JPanel {
     
     public int zoomPlus(){
         int graphSizeX = getGraphSizeX();
-        Double ratioDataPixels = (new Double(graphSizeX) / (getWidth()-marginLeft-marginRight));
+        Double ratioDataPixels = (new Double(graphSizeX) / (getWidth()-MARGIN_LEFT-MARGIN_RIGHT));
         if (ratioDataPixels > 0.2){
             scale *= 2;
             firstDrawPoint += (graphSizeX/2);
@@ -89,7 +98,7 @@ public class JPanel extends javax.swing.JPanel {
     public int zoomMinus(){
         int graphSizeX = getGraphSizeX();
         if (firstDrawPoint < graphSizeX){
-            scale = new Double(getWidth()-marginLeft-marginRight)/(graphPrices.size());
+            scale = new Double(getWidth()-MARGIN_LEFT-MARGIN_RIGHT)/(graphPrices.size());
             firstDrawPoint = 1;
         }
         else {
@@ -103,12 +112,12 @@ public class JPanel extends javax.swing.JPanel {
     }
     
     public int getGraphSizeX(){
-        Double graphSizeXDouble = ((getWidth()-marginLeft-marginRight)/scale); //size for scale legend
+        Double graphSizeXDouble = ((getWidth()-MARGIN_LEFT-MARGIN_RIGHT)/scale); //size for scale legend
         return graphSizeXDouble.intValue();
     }
     
     public int getGraphSixeY(){
-        return getHeight()-marginTop-marginBotton;
+        return getHeight()-MARGIN_TOP-MARGIN_BOTTOM;
     }
     
     /** This method is called from within the constructor to

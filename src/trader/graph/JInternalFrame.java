@@ -33,15 +33,14 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         try {
             setVisible(true);
             TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
-            jPanel1.setGraphPrices(graphPrices);
+            jPanel1.setGraphPrices(graphPrices, trader.graph.PricesDraw.GRAPH_STYLE_CANDLESTICK);
             
-            int graphSizeX = jPanel1.getWidth()-jPanel1.getMarginLeft()-jPanel1.getMarginRight();
-            int jScrollBarExtent = (int) (graphPrices.size()*(new Double(graphSizeX)/graphPrices.size()));
-            int jScrollBarValue = (graphPrices.size()-graphSizeX);
+            int jScrollBarVisibleAmount = (int) (graphPrices.size()*(new Double(jPanel1.getGraphSizeX())/graphPrices.size()));
+            int jScrollBarValue = (graphPrices.size()-jPanel1.getGraphSizeX());
             jScrollBar1.setValues(jScrollBarValue
-                    , jScrollBarExtent
-                    , 1
-                    , graphPrices.size());
+                                , jScrollBarVisibleAmount
+                                , 1
+                                , graphPrices.size());
         }
         catch(Exception e){
             System.out.println("Error getting prices");

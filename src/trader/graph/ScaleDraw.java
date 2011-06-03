@@ -4,6 +4,7 @@
  */
 package trader.graph;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 /**
@@ -21,6 +22,7 @@ public class ScaleDraw {
     }
     
     public void drawScale(Graphics g){
+        g.setColor(Color.gray);
         g.drawRect(x1, y1, x2,y2);
     }
 }
