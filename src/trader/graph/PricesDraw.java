@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.TreeMap;
 import quote.Prices;
 
@@ -18,15 +19,17 @@ import quote.Prices;
 public class PricesDraw {
     private TreeMap<Long, Prices> graphPrices;
     private final Double graphYMarginRate = 0.2; // 10% graph margin, both top and bottom -> 20%
-    
     public static final int GRAPH_STYLE_LINE   = 1
                            ,GRAPH_STYLE_CANDLESTICK    = 2;
-    
     private int graphStyle;
     
     public PricesDraw(TreeMap<Long, Prices> graphPrices, int graphStyle){
         this.graphPrices = graphPrices;
         this.graphStyle = graphStyle;
+    }
+    
+     public TreeMap<Long, Prices> getGraphPrices() {
+        return graphPrices;
     }
     
     public void draw(Graphics g
@@ -141,7 +144,8 @@ public class PricesDraw {
                     yHigh = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getHigh())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
                     yLow = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getLow())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
                     yAdjClose = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
-                    alCandleStickPoints.add(new CandleStickPoint(x
+                    alCandleStickPoints.add(new CandleStickPoint(longTimeMillis
+                                                    ,x
                                                     , yLow.intValue()
                                                     , yHigh.intValue()
                                                     , yAdjClose.intValue()));
@@ -159,7 +163,7 @@ public class PricesDraw {
                     g.setColor(((candleStickpoint.getCloseY()-previousCandleStickPoint.getCloseY()) < 0) ? Color.green : Color.red );
                     
                     g.fillRect(candleStickpoint.getX()-1
-                            , Math.max(previousCandleStickPoint.getCloseY(),candleStickpoint.getCloseY())
+                            , Math.min(previousCandleStickPoint.getCloseY(),candleStickpoint.getCloseY())
                             , 3
                             , Math.abs(candleStickpoint.getCloseY()-previousCandleStickPoint.getCloseY()));
                 }

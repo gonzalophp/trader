@@ -28,16 +28,6 @@ public class JPanel extends javax.swing.JPanel {
     private trader.graph.JInternalFrame jInternalFrame1;
     private trader.graph.ScaleDraw scaleDraw;
     private trader.graph.PricesDraw pricesDraw;
-    
-    public int getMarginLeft() {
-        return MARGIN_LEFT;
-    }
-
-    public int getMarginRight() {
-        return MARGIN_RIGHT;
-    }
-    
-    private TreeMap<Long, Prices> graphPrices;
     private boolean dataSet;
     private int firstDrawPoint;
     private Double scale;
@@ -62,11 +52,10 @@ public class JPanel extends javax.swing.JPanel {
     }
     
     public void setGraphPrices(TreeMap<Long, Prices> graphPrices, int graphStyle){
-        this.graphPrices = graphPrices;
         jInternalFrame1 = (trader.graph.JInternalFrame)getParentObject(this,"trader.graph.JInternalFrame");
         dataSet = true;
         
-        pricesDraw = new PricesDraw(graphPrices,graphStyle);
+        pricesDraw = new PricesDraw(graphPrices, graphStyle);
         switch (graphStyle) {
             case PricesDraw.GRAPH_STYLE_LINE:
                 scale = 1.0;
@@ -98,7 +87,7 @@ public class JPanel extends javax.swing.JPanel {
     public int zoomMinus(){
         int graphSizeX = getGraphSizeX();
         if (firstDrawPoint < graphSizeX){
-            scale = new Double(getWidth()-MARGIN_LEFT-MARGIN_RIGHT)/(graphPrices.size());
+            scale = new Double(getWidth()-MARGIN_LEFT-MARGIN_RIGHT)/(pricesDraw.getGraphPrices().size());
             firstDrawPoint = 1;
         }
         else {
@@ -168,8 +157,8 @@ public class JPanel extends javax.swing.JPanel {
     private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
             int newFirstDrawPoint = firstDrawPoint+lastMouseDragX-evt.getX();
             
-            if ((newFirstDrawPoint+getGraphSizeX())>graphPrices.size()){
-                newFirstDrawPoint = graphPrices.size()-getGraphSizeX();
+            if ((newFirstDrawPoint+getGraphSizeX())>pricesDraw.getGraphPrices().size()){
+                newFirstDrawPoint = pricesDraw.getGraphPrices().size()-getGraphSizeX();
             }
             if ((firstDrawPoint != newFirstDrawPoint) &&(newFirstDrawPoint>1)){
                 lastMouseDragX = evt.getX();
@@ -185,6 +174,14 @@ public class JPanel extends javax.swing.JPanel {
         
         return component;
         
+    }
+    
+    public int getMarginLeft() {
+        return MARGIN_LEFT;
+    }
+
+    public int getMarginRight() {
+        return MARGIN_RIGHT;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

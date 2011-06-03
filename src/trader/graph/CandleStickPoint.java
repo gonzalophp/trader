@@ -10,14 +10,23 @@ package trader.graph;
  */
 public class CandleStickPoint {
     private int x, minY, maxY, closeY;
-
-    public CandleStickPoint(int x, int minY, int maxY,int closeY) {
+    private long longTimeMillis;
+    public CandleStickPoint(long longTimeMillis,int x, int minY, int maxY,int closeY) {
+        this.longTimeMillis = longTimeMillis;
         this.x = x;
         this.minY = minY;
         this.maxY = maxY;
         this.closeY = closeY;
     }
-
+    
+    public long getLongTimeMillis() {
+        return longTimeMillis;
+    }
+    
+    public int getX() {
+        return x;
+    }
+    
     public int getCloseY() {
         return closeY;
     }
@@ -30,7 +39,5 @@ public class CandleStickPoint {
         return minY;
     }
 
-    public int getX() {
-        return x;
-    }
+    
 }

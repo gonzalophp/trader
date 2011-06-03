@@ -30,7 +30,7 @@ public class Yahoo implements PriceReader {
         InputStreamReader  inStream = null;
         BufferedReader buff = null;
         try{
-            url  = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ticket+"&a=0&b=1&c=2003&d="+calendar.get(Calendar.DAY_OF_MONTH)+"&e="+calendar.get(Calendar.MONTH)+"&f="+calendar.get(Calendar.YEAR)+"&g=d&ignore=.csv");                    
+            url  = new URL("http://ichart.finance.yahoo.com/table.csv?s="+ticket+"&a=0&b=1&c=2003&d="+calendar.get(Calendar.MONTH)+"&e="+calendar.get(Calendar.DAY_OF_MONTH)+"&f="+calendar.get(Calendar.YEAR)+"&g=d&ignore=.csv");                    
             System.out.println(url);
             urlConn = url.openConnection();
             inStream = new InputStreamReader(urlConn.getInputStream());
