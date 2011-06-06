@@ -41,7 +41,7 @@ public class Yahoo implements PriceReader {
                 String[] dateValues = nextLineValues[0].split("-");
                 if (dateValues.length != 3) continue;
                 calendar.set(Integer.parseInt(dateValues[0])
-                            ,Integer.parseInt(dateValues[1])
+                            ,Integer.parseInt(dateValues[1])-1
                             ,Integer.parseInt(dateValues[2])
                             ,23
                             ,59

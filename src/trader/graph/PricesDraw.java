@@ -137,6 +137,34 @@ public class PricesDraw {
             Double[] minYAndMaxY = _getMinAndMax(firstDrawPoint, graphSizeX);
             Double deltaY=(minYAndMaxY[1]-minYAndMaxY[0])*(1+graphYMarginRate);
             
+            
+            int[] graphScaleValues = _getGraphScale(deltaY);
+            
+            Double emptySizeY = ((minYAndMaxY[1]-minYAndMaxY[0])*graphYMarginRate)/2;
+            System.out.println("minYAndMaxY[0]:"+minYAndMaxY[0]+" minYAndMaxY[1]:"+minYAndMaxY[1]+" emptySizeY:"+emptySizeY);
+//            int y1 = (int) (Math.pow(10, graphScaleValues[1])*(minYAndMaxY[1]+emptySizeY));
+//            int y2 = (int) (Math.pow(10, graphScaleValues[1])*(minYAndMaxY[0]-emptySizeY));
+            
+            int y1 = (int) (minYAndMaxY[1]+emptySizeY);
+            int y2 = (int) (minYAndMaxY[0]-emptySizeY);
+            
+            System.out.println("y1:"+y1+" y2:"+y2+" [0]:"+graphScaleValues[0]+" [1]:"+graphScaleValues[1]);
+            int ySegment = (int) (graphScaleValues[0]*Math.pow(10, graphScaleValues[1]));
+            System.out.println("ySegment:"+ySegment+" graphSizeY:"+graphSizeY);
+            int yGraph;
+            g.setColor(Color.lightGray);
+            for (int yAux=y1;yAux>y2;yAux--){
+                if ((yAux % ySegment) == 0){
+                    Double a = new Double(y1-yAux)/(y1-y2);
+                    yGraph = ((int)((new Double(y1-yAux)/(y1-y2))*graphSizeY))+marginTop;
+                    System.out.println("a:"+a+" yAux:"+yAux+" yGraph:"+yGraph);
+                    g.drawString(""+yAux, marginLeft+(int)(graphSizeX*scale), yGraph);
+                    g.drawLine(marginLeft, yGraph, marginLeft+(int)(graphSizeX*scale), yGraph);
+                }
+            }
+            
+            
+            i=0;
             ArrayList<CandleStickPoint> alCandleStickPoints = new ArrayList<CandleStickPoint>();
             for(long  longTimeMillis: graphPrices.keySet()){
                 if (i++ >= firstDrawPoint) {
@@ -156,12 +184,15 @@ public class PricesDraw {
             CandleStickPoint previousCandleStickPoint=null;
             Calendar previousCalendar = Calendar.getInstance();
             Calendar calendar = Calendar.getInstance();
+            String[] monthName = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+             
             for(CandleStickPoint candleStickpoint:alCandleStickPoints){
                 if(previousCandleStickPoint!=null){
                     calendar.setTimeInMillis(candleStickpoint.getLongTimeMillis());
                     if (calendar.get(Calendar.MONTH) != previousCalendar.get(Calendar.MONTH)){
                         g.setColor(Color.lightGray);
                         g.drawLine(candleStickpoint.getX(), marginTop, candleStickpoint.getX(), marginTop+graphSizeY);
+                        g.drawString(monthName[calendar.get(Calendar.MONTH)], candleStickpoint.getX()+5, graphSizeY+marginTop+10);
                     }
                     
                     g.setColor(Color.black);
@@ -199,6 +230,61 @@ public class PricesDraw {
         Double[] MinAndMaxGraphY = {minY,maxY};
         
         return MinAndMaxGraphY;
+    }
+    
+    
+    public int[] _getGraphScale(Double deltaY) {
+        final int segments = 7;
+        
+        int fractionalDigits=0;
+        int allDigitsdeltaYInteger=0;
+        
+        String deltaYString = ""+deltaY;
+        String[] deltaYSplitted = deltaYString.split("\\.");
+        
+        if (deltaYSplitted.length>1){
+            deltaYSplitted[1] = deltaYSplitted[1].substring(0, ((deltaYSplitted[1].length() > 4)? 4 : deltaYSplitted[1].length()));
+            fractionalDigits=-deltaYSplitted[1].length();
+            try{
+            allDigitsdeltaYInteger = Integer.parseInt(deltaYSplitted[0]+deltaYSplitted[1]);
+            }catch(Exception e){
+                System.out.println("deltaYSplitted[0]:"+deltaYSplitted[0]+" deltaYSplitted[1]:"+deltaYSplitted[1]);
+            }
+        }
+        else {
+            fractionalDigits=0;
+            allDigitsdeltaYInteger = new Integer(deltaYSplitted[0]);
+        }
+        
+        Double segmentAmp = new Double(allDigitsdeltaYInteger)/segments;
+        Double[] scaleMap = {0.7, 1.4, 3.25, 7.0};
+        boolean segmentFound=false;
+        do {
+            if (segmentAmp > scaleMap[scaleMap.length-1]){
+                segmentAmp /= 10;
+                fractionalDigits++;
+            }
+            else if (segmentAmp < scaleMap[0]) {
+                segmentAmp *= 10;
+                fractionalDigits--;
+            }
+            else {
+                segmentFound = true;
+            }
+        } while (!segmentFound);
+        
+        int[] scaleUnits = {1,2,5};
+        int scaleUnit=0;
+        for (int i=scaleMap.length-2;i>=0;i--){
+            if (segmentAmp>scaleMap[i]){
+                scaleUnit = scaleUnits[i];
+                break;
+            }
+        }
+        
+        int[] result = {scaleUnit,fractionalDigits};
+        
+        return result;        
     }
     
 }
