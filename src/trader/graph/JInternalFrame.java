@@ -29,6 +29,7 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
     }
     
     public void drawQuote(String ticketQuote, quote.source.PriceReader dataSource){
+        this.setTitle(ticketQuote);
         historicalData.loadPrices(ticketQuote, dataSource);
         try {
             setVisible(true);

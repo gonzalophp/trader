@@ -130,7 +130,8 @@ public class PricesDraw {
                                 , long firstDrawPoint){
         
         if (firstDrawPoint > 0){
-            Double yLow=0.0, yHigh=0.0, yAdjClose=0.0;
+            Double yLow=0.0, yHigh=0.0,yOpen = 0.0, yClose = 0.0
+                    , yAdjClose=0.0;
             long i=0;
             int x=0;
             
@@ -158,8 +159,8 @@ public class PricesDraw {
                     Double a = new Double(y1-yAux)/(y1-y2);
                     yGraph = ((int)((new Double(y1-yAux)/(y1-y2))*graphSizeY))+marginTop;
                     System.out.println("a:"+a+" yAux:"+yAux+" yGraph:"+yGraph);
-                    g.drawString(""+yAux, marginLeft+(int)(graphSizeX*scale), yGraph);
-                    g.drawLine(marginLeft, yGraph, marginLeft+(int)(graphSizeX*scale), yGraph);
+                    g.drawString(""+yAux, marginLeft+(int)(graphSizeX*scale)+3, yGraph+4);
+                    g.drawLine(marginLeft, yGraph, marginLeft+(int)(graphSizeX*scale)+1, yGraph);
                 }
             }
             
@@ -171,12 +172,16 @@ public class PricesDraw {
                     x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
                     yHigh = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getHigh())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
                     yLow = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getLow())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
-                    yAdjClose = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+//                    yAdjClose = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    yOpen = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getOpen())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    yClose = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    
                     alCandleStickPoints.add(new CandleStickPoint(longTimeMillis
                                                     ,x
                                                     , yLow.intValue()
                                                     , yHigh.intValue()
-                                                    , yAdjClose.intValue()));
+                                                    , yOpen.intValue()
+                                                    , yClose.intValue()));
                 }
                 if ((i-firstDrawPoint) >= graphSizeX ) break;
             }
@@ -191,18 +196,18 @@ public class PricesDraw {
                     calendar.setTimeInMillis(candleStickpoint.getLongTimeMillis());
                     if (calendar.get(Calendar.MONTH) != previousCalendar.get(Calendar.MONTH)){
                         g.setColor(Color.lightGray);
-                        g.drawLine(candleStickpoint.getX(), marginTop, candleStickpoint.getX(), marginTop+graphSizeY);
-                        g.drawString(monthName[calendar.get(Calendar.MONTH)], candleStickpoint.getX()+5, graphSizeY+marginTop+10);
+                        g.drawLine(candleStickpoint.getX(), marginTop, candleStickpoint.getX(), marginTop+graphSizeY+5);
+                        g.drawString(calendar.get(Calendar.YEAR)+" "+monthName[calendar.get(Calendar.MONTH)], candleStickpoint.getX()+5, graphSizeY+marginTop+14);
                     }
                     
                     g.setColor(Color.black);
                     g.drawLine(candleStickpoint.getX(), candleStickpoint.getMinY(), candleStickpoint.getX(), candleStickpoint.getMaxY());
                     
-                    g.setColor(((candleStickpoint.getCloseY()-previousCandleStickPoint.getCloseY()) < 0) ? Color.green : Color.red );
+                    g.setColor(((candleStickpoint.getCloseY()-candleStickpoint.getOpenY()) > 0) ? Color.red : Color.green );
                     g.fillRect(candleStickpoint.getX()-1
-                            , Math.min(previousCandleStickPoint.getCloseY(),candleStickpoint.getCloseY())
+                            , Math.min(candleStickpoint.getOpenY(),candleStickpoint.getCloseY())
                             , 3
-                            , Math.abs(candleStickpoint.getCloseY()-previousCandleStickPoint.getCloseY()));
+                            , Math.abs(candleStickpoint.getCloseY()-candleStickpoint.getOpenY()));
                 }
                 previousCalendar.setTimeInMillis(candleStickpoint.getLongTimeMillis());
                 previousCandleStickPoint = candleStickpoint;
@@ -234,7 +239,7 @@ public class PricesDraw {
     
     
     public int[] _getGraphScale(Double deltaY) {
-        final int segments = 7;
+        final int segments = 5;
         
         int fractionalDigits=0;
         int allDigitsdeltaYInteger=0;
