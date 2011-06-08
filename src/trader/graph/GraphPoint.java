@@ -8,16 +8,22 @@ package trader.graph;
  *
  * @author fiber
  */
-public class CandleStickPoint {
-    private int x, minY, maxY, openY, closeY;
+public class GraphPoint {
+    private int x, minY, maxY, openY, closeY, adjCloseY;
     private long longTimeMillis;
-    public CandleStickPoint(long longTimeMillis,int x, int minY, int maxY, int openY, int closeY) {
+    public GraphPoint(long longTimeMillis,int x, int minY, int maxY, int openY, int closeY) {
         this.longTimeMillis = longTimeMillis;
         this.x = x;
         this.minY = minY;
         this.maxY = maxY;
         this.openY = openY;
         this.closeY = closeY;
+    }
+    
+    public GraphPoint(long longTimeMillis,int x, int adjCloseY) {
+        this.longTimeMillis = longTimeMillis;
+        this.x = x;
+        this.adjCloseY = adjCloseY;
     }
     
     public long getLongTimeMillis() {
@@ -28,6 +34,14 @@ public class CandleStickPoint {
         return x;
     }
     
+    public int getMinY() {
+        return minY;
+    }
+    
+    public int getMaxY() {
+        return maxY;
+    }
+
     public int getOpenY(){
         return openY;
     }
@@ -36,12 +50,8 @@ public class CandleStickPoint {
         return closeY;
     }
 
-    public int getMaxY() {
-        return maxY;
-    }
-
-    public int getMinY() {
-        return minY;
+    public int getAdjCloseY(){
+        return adjCloseY;
     }
 
     

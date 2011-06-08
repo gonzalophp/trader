@@ -51,18 +51,26 @@ public class JPanel extends javax.swing.JPanel {
         }
     }
     
-    public void setGraphPrices(TreeMap<Long, Prices> graphPrices, int graphStyle){
+    public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
         jInternalFrame1 = (trader.graph.JInternalFrame)getParentObject(this,"trader.graph.JInternalFrame");
         dataSet = true;
-        
-        pricesDraw = new PricesDraw(graphPrices, graphStyle);
+        pricesDraw = new PricesDraw(graphPrices);
+    }
+
+    public PricesDraw getPricesDraw() {
+        return pricesDraw;
+    }
+    
+    public void setGraphStyle(int graphStyle){
+        pricesDraw.setGraphStyle(graphStyle);
         switch (graphStyle) {
             case PricesDraw.GRAPH_STYLE_LINE:
                 scale = 1.0;
+                firstDrawPoint = pricesDraw.getGraphPrices().size() - getGraphSizeX();
             break;
             case PricesDraw.GRAPH_STYLE_CANDLESTICK:
                 scale = 3.0;
-                firstDrawPoint += getGraphSizeX()*2;
+                firstDrawPoint = pricesDraw.getGraphPrices().size() - getGraphSizeX();
             break;
         }
     }
@@ -83,7 +91,7 @@ public class JPanel extends javax.swing.JPanel {
         
         return firstDrawPoint;
     }
-    
+
     public int zoomMinus(){
         int graphSizeX = getGraphSizeX();
         if (firstDrawPoint < graphSizeX){

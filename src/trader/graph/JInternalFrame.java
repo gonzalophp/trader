@@ -34,8 +34,8 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         try {
             setVisible(true);
             TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
-            jPanel1.setGraphPrices(graphPrices, trader.graph.PricesDraw.GRAPH_STYLE_CANDLESTICK);
-            
+            jPanel1.setGraphPrices(graphPrices);
+            jComboBox2.setSelectedItem(new String("candlestick"));
             jScrollBar1.setValues(graphPrices.size()-jPanel1.getGraphSizeX()
                                 , jPanel1.getGraphSizeX()
                                 , 1
@@ -64,6 +64,7 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         jScrollBar1 = new javax.swing.JScrollBar();
         jToggleButton1 = new javax.swing.JToggleButton();
         jToggleButton2 = new javax.swing.JToggleButton();
+        jComboBox2 = new javax.swing.JComboBox();
 
         setClosable(true);
         setIconifiable(true);
@@ -115,6 +116,14 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
             }
         });
 
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "line", "candlestick" }));
+        jComboBox2.setName("jComboBox2"); // NOI18N
+        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -123,7 +132,10 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 383, Short.MAX_VALUE)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jScrollBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -136,9 +148,11 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -166,8 +180,17 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
+    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+        jPanel1.setGraphStyle(jComboBox2.getSelectedIndex()+1);
+        jScrollBar1.setValues(jPanel1.getPricesDraw().getGraphPrices().size()-jPanel1.getGraphSizeX()
+                                , jPanel1.getGraphSizeX()
+                                , 1
+                                , jPanel1.getPricesDraw().getGraphPrices().size());
+    }//GEN-LAST:event_jComboBox2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
     private trader.graph.JPanel jPanel1;
     private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JToggleButton jToggleButton1;
