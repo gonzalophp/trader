@@ -169,10 +169,10 @@ public class PricesDraw {
             
             Calendar calendar           = Calendar.getInstance();
             Calendar previousCalendar   = Calendar.getInstance();
-             
+            i=0;
             for(GraphPoint graphPoint:alGraphPoints){
                 calendar.setTimeInMillis(graphPoint.getLongTimeMillis());
-                if (calendar.get(Calendar.MONTH) != previousCalendar.get(Calendar.MONTH)){
+                if ((i++ > 0) && (calendar.get(Calendar.MONTH) != previousCalendar.get(Calendar.MONTH))){
                     g.setColor(Color.lightGray);
                     g.drawLine(graphPoint.getX(), marginTop, graphPoint.getX(), marginTop+graphSizeY+5);
                     g.drawString(calendar.get(Calendar.YEAR)+" "+monthName[calendar.get(Calendar.MONTH)], graphPoint.getX()+5, graphSizeY+marginTop+14);
