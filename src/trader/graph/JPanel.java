@@ -82,7 +82,7 @@ public class JPanel extends javax.swing.JPanel {
     
     public int zoomPlus(){
         int graphSizeX = getGraphSizeX();
-        Double ratioDataPixels = (new Double(graphSizeX) / (getWidth()-MARGIN_LEFT-MARGIN_RIGHT));
+        Double ratioDataPixels = (new Double(graphSizeX*scale) / (getWidth()-MARGIN_LEFT-MARGIN_RIGHT));
         if (ratioDataPixels > 0.2){
             scale *= 2;
             firstDrawPoint += (graphSizeX/2);
@@ -136,6 +136,11 @@ public class JPanel extends javax.swing.JPanel {
                 formMouseReleased(evt);
             }
         });
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
@@ -174,6 +179,14 @@ public class JPanel extends javax.swing.JPanel {
                 setFirstDrawPoint(newFirstDrawPoint);
             }
     }//GEN-LAST:event_formMouseDragged
+
+private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+    if (scaleDraw != null){
+        trader.graph.JPanel jPanelAux = (trader.graph.JPanel)evt.getComponent();
+        scaleDraw.setDimension((int)(jPanelAux.getGraphSizeX()*scale), jPanelAux.getGraphSixeY());
+        firstDrawPoint = pricesDraw.getGraphPrices().size()-jPanelAux.getGraphSizeX();
+    }
+}//GEN-LAST:event_formComponentResized
 
     private java.awt.Component getParentObject(java.awt.Component component, String className){
         try {

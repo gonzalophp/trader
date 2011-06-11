@@ -57,7 +57,7 @@
                   <Component id="jComboBox2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jPanel1" pref="339" max="32767" attributes="0"/>
+              <Component id="jPanel1" pref="343" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="jScrollBar1" max="32767" attributes="1"/>

@@ -17,19 +17,14 @@ import quote.Prices;
  */
 public class PricesDraw {
     private TreeMap<Long, Prices> graphPrices;
-    private final Double graphYMarginRate = 0.2; // 10% graph margin, both top and bottom -> 20%
     private final String[] monthName = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+    private final Double graphYMarginRate = 0.2; // 10% graph margin, both top and bottom -> 20%
     public static final int GRAPH_STYLE_LINE   = 1
                            ,GRAPH_STYLE_CANDLESTICK    = 2;
-    private int graphStyle;
-    
-    
-    Graphics g;
-    int marginLeft,marginTop,graphSizeX,graphSizeY;
-    Double scale;
-    long firstDrawPoint;
-                    
-                    
+    private int graphStyle,marginLeft,marginTop,graphSizeX,graphSizeY;;
+    private Graphics g;
+    private Double scale;
+    private long firstDrawPoint;
     
     public PricesDraw(TreeMap<Long, Prices> graphPrices){
         this.graphPrices = graphPrices;
@@ -39,7 +34,7 @@ public class PricesDraw {
         this.graphStyle = graphStyle;
     }
     
-     public TreeMap<Long, Prices> getGraphPrices() {
+    public TreeMap<Long, Prices> getGraphPrices() {
         return graphPrices;
     }
     
@@ -65,6 +60,97 @@ public class PricesDraw {
             case GRAPH_STYLE_CANDLESTICK:
                 _drawCandleStick();
             break;
+        }
+    }
+    
+    public void drawSARParabolic(){
+        if (firstDrawPoint > 0){
+            long i=0;
+            int x=0,ySAR=0;
+            Double[] minYAndMaxY = _getMinAndMax(firstDrawPoint, graphSizeX);
+            Double deltaY=(minYAndMaxY[1]-minYAndMaxY[0])*(1+graphYMarginRate);
+            
+            _drawScale(minYAndMaxY);
+            
+            quote.Prices previousPrice = graphPrices.get(graphPrices.firstKey());
+            Double previousSAR=0.0, currentSAR=0.0,extremePoint=0.0
+                    , accelerationFactor = 0.0
+                    , initialAccelerationFactor=0.02
+                    , accelerationFactorIncrease=0.02
+                    , accelerationFactorLimit = 0.2
+                    , previousAccelerationFactor=0.0;
+            boolean trendUp=true,accelerated=false;
+            for(long  longTimeMillis: graphPrices.keySet()){
+                if (i++ >= firstDrawPoint) {
+                    
+                    if ((i-1) == firstDrawPoint){
+                        trendUp = ((graphPrices.get(longTimeMillis).getAdjClose()-previousPrice.getAdjClose()) > 0);
+                        currentSAR = trendUp ? previousPrice.getLow():previousPrice.getHigh();
+                        extremePoint = currentSAR;
+                        accelerationFactor = initialAccelerationFactor;
+                        System.out.println("extremePoint:"+extremePoint);
+                    }
+                    else {
+                        if (trendUp){
+                            if (graphPrices.get(longTimeMillis).getHigh() > extremePoint){
+                                extremePoint = graphPrices.get(longTimeMillis).getHigh();
+                                accelerationFactor +=accelerationFactorIncrease;
+                                accelerated = (accelerationFactor < accelerationFactorLimit);
+                                if (accelerationFactor > accelerationFactorLimit){
+                                    accelerationFactor = accelerationFactorLimit;
+                                }
+                            }
+                        }
+                        else {
+                            if (graphPrices.get(longTimeMillis).getLow() < extremePoint){
+                                extremePoint = graphPrices.get(longTimeMillis).getLow();
+                                accelerationFactor +=accelerationFactorIncrease;
+                                accelerated = (accelerationFactor < accelerationFactorLimit);
+                                if (accelerationFactor > accelerationFactorLimit){
+                                    accelerationFactor = accelerationFactorLimit;
+                                }
+                            }
+                        }
+                        currentSAR = previousSAR + accelerationFactor*(extremePoint-previousSAR);
+                        
+                        if ( ((trendUp) && (currentSAR >= graphPrices.get(longTimeMillis).getLow())) 
+                          || ((!trendUp) && (currentSAR <= graphPrices.get(longTimeMillis).getHigh()))){
+                            if (accelerated){
+                                currentSAR = previousSAR + previousAccelerationFactor*(extremePoint-previousSAR);
+                                
+                                if ( ((trendUp) && (currentSAR >= graphPrices.get(longTimeMillis).getLow())) 
+                                 || ((!trendUp) && (currentSAR <= graphPrices.get(longTimeMillis).getHigh()))){
+                                    trendUp = !trendUp;
+                                    currentSAR = extremePoint;
+                                    accelerationFactor = initialAccelerationFactor;
+                                }
+                                else {
+                                    accelerationFactor = previousAccelerationFactor;
+                                }
+                            }
+                            else {
+                                trendUp = !trendUp;
+                                currentSAR = (trendUp) ? Math.min(extremePoint,graphPrices.get(longTimeMillis).getLow()) : Math.max(extremePoint,graphPrices.get(longTimeMillis).getHigh());
+                                extremePoint = (trendUp) ? graphPrices.get(longTimeMillis).getHigh(): graphPrices.get(longTimeMillis).getLow();
+                                accelerationFactor = initialAccelerationFactor;
+                            }
+                        }
+                    }
+                    previousSAR = currentSAR;
+                    previousAccelerationFactor = accelerationFactor;
+                    x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
+                    ySAR = (int) ((graphSizeY*(minYAndMaxY[1]-currentSAR)/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
+                    
+                    g.setColor((trendUp) ? new Color(0,180,0) : new Color(180,0,0) ); 
+                    g.fillOval(x-1
+                            , ySAR
+                            , 4
+                            , 4);
+                    
+                }
+                if ((i-firstDrawPoint) >= graphSizeX ) break;
+                previousPrice = graphPrices.get(longTimeMillis);
+            }
         }
     }
     
@@ -188,6 +274,7 @@ public class PricesDraw {
                         , Math.abs(graphPoint.getCloseY()-graphPoint.getOpenY()));
                 previousCalendar.setTimeInMillis(graphPoint.getLongTimeMillis());
             }
+            drawSARParabolic();
         }
     }
     
@@ -231,7 +318,7 @@ public class PricesDraw {
     }
     
     
-    public int[] _getGraphScale(Double deltaY) {
+    private int[] _getGraphScale(Double deltaY) {
         final int segments = 5;
         
         int fractionalDigits=0;
@@ -244,7 +331,7 @@ public class PricesDraw {
             deltaYSplitted[1] = deltaYSplitted[1].substring(0, ((deltaYSplitted[1].length() > 4)? 4 : deltaYSplitted[1].length()));
             fractionalDigits=-deltaYSplitted[1].length();
             try{
-            allDigitsdeltaYInteger = Integer.parseInt(deltaYSplitted[0]+deltaYSplitted[1]);
+                allDigitsdeltaYInteger = Integer.parseInt(deltaYSplitted[0]+deltaYSplitted[1]);
             }catch(Exception e){
                 System.out.println("deltaYSplitted[0]:"+deltaYSplitted[0]+" deltaYSplitted[1]:"+deltaYSplitted[1]);
             }

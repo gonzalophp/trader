@@ -10,10 +10,8 @@
  */
 package trader.graph;
 
-import java.text.ParseException;
 import java.util.TreeMap;
 import javax.swing.JScrollBar;
-import quote.Prices;
 
 /**
  *
@@ -35,7 +33,7 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
             setVisible(true);
             TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
             jPanel1.setGraphPrices(graphPrices);
-            jComboBox2.setSelectedItem(new String("candlestick"));
+            jComboBox2.setSelectedItem("candlestick");
             jScrollBar1.setValues(graphPrices.size()-jPanel1.getGraphSizeX()
                                 , jPanel1.getGraphSizeX()
                                 , 1

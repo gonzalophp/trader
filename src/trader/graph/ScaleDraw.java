@@ -25,5 +25,12 @@ public class ScaleDraw {
         g.setColor(Color.gray);
         g.drawRect(x1, y1, x2,y2);
     }
+    
+    public void setDimension(int x2, int y2){
+        
+//        System.out.println(x2+" "+y2);
+        this.x2 = x2;
+        this.y2 = y2;
+    }
 }
 

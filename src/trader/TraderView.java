@@ -4,7 +4,6 @@
 
 package trader;
 
-import java.util.TreeMap;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -12,14 +11,10 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import quote.Prices;
 
 /**
  * The application's main frame.
@@ -30,6 +25,11 @@ public class TraderView extends FrameView {
         super(app);
 
         initComponents();
+        
+        jInternalFrame1 = new trader.graph.JInternalFrame();
+        jInternalFrame1.setName("jInternalFrame1"); // NOI18N
+        jInternalFrame1.setBounds(100, 0, 600, 500);
+        mainPanel.add(jInternalFrame1);
 
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
@@ -106,7 +106,6 @@ public class TraderView extends FrameView {
     private void initComponents() {
 
         mainPanel = new javax.swing.JPanel();
-        jInternalFrame1 = new trader.graph.JInternalFrame();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -121,27 +120,15 @@ public class TraderView extends FrameView {
 
         mainPanel.setName("mainPanel"); // NOI18N
 
-        jInternalFrame1.setName("jInternalFrame1"); // NOI18N
-
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 671, Short.MAX_VALUE)
-            .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(mainPanelLayout.createSequentialGroup()
-                    .addGap(0, 335, Short.MAX_VALUE)
-                    .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 336, Short.MAX_VALUE)))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 409, Short.MAX_VALUE)
-            .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(mainPanelLayout.createSequentialGroup()
-                    .addGap(0, 204, Short.MAX_VALUE)
-                    .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 205, Short.MAX_VALUE)))
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -220,15 +207,14 @@ public class TraderView extends FrameView {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         jInternalFrame1.drawQuote("SHP.L",new quote.source.Yahoo());
         
-//        try {
-//            jInternalFrame1.setQuoteData("LLOY.L");
-//        } catch (ParseException ex) {
-//            Logger.getLogger(TraderView.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        
+        jInternalFrame1 = new trader.graph.JInternalFrame();
+        jInternalFrame1.setName("jInternalFrame1"); // NOI18N
+        jInternalFrame1.setBounds(100, 0, 600, 500);
+        mainPanel.add(jInternalFrame1);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private trader.graph.JInternalFrame jInternalFrame1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
@@ -243,6 +229,6 @@ public class TraderView extends FrameView {
     private final Icon idleIcon;
     private final Icon[] busyIcons = new Icon[15];
     private int busyIconIndex = 0;
-
+    private trader.graph.JInternalFrame jInternalFrame1;
     private JDialog aboutBox;
 }
