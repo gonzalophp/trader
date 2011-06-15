@@ -8,6 +8,10 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.TreeMap;
 import quote.Prices;
 
@@ -63,93 +67,158 @@ public class PricesDraw {
         }
     }
     
+    public void drawBollinger(){
+        if (firstDrawPoint > 0){
+            Double[] minYAndMaxY = _getMinAndMax(firstDrawPoint, graphSizeX);
+            Double deltaY=(minYAndMaxY[1]-minYAndMaxY[0])*(1+graphYMarginRate);
+            
+            int i=0
+                ,n=20,x,ySMA,yDeviationUp,yDeviationDown;
+            Double deviationFactor = 2.0, SMA=0.0, deviation=0.0;
+            HashMap<Integer,Double> indicatorPrices = new HashMap<Integer,Double>();
+            for(long  longTimeMillis: graphPrices.keySet()){
+                
+                indicatorPrices.put((i++ % n), graphPrices.get(longTimeMillis).getClose());
+                if (i >= firstDrawPoint) {
+                    Double sum=0.0;
+                    for (int key :indicatorPrices.keySet()){
+                        sum += indicatorPrices.get(key);
+                    }
+                    SMA = sum/n;
+                    
+                    sum=0.0;
+                    for (int key :indicatorPrices.keySet()){
+                        sum += Math.pow((indicatorPrices.get(key)-SMA),2);
+                    }
+                    
+                    deviation = Math.sqrt(sum/n);
+                    
+                    
+                    x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
+                    ySMA = (int) ((graphSizeY*(minYAndMaxY[1]-(SMA))/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
+                    yDeviationUp = (int) ((graphSizeY*(minYAndMaxY[1]-(SMA+deviationFactor*deviation))/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
+                    yDeviationDown = (int) ((graphSizeY*(minYAndMaxY[1]-(SMA-deviationFactor*deviation))/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
+                    
+                    
+                    g.setColor(Color.blue); 
+                    g.drawLine(x, yDeviationUp, x, yDeviationUp+1);
+                    g.drawLine(x, ySMA, x, ySMA+1);
+                    g.drawLine(x, yDeviationDown, x, yDeviationDown+1);
+                    
+                }
+                if ((i-firstDrawPoint) >= graphSizeX ) break;
+            }
+        }
+    }
+    
     public void drawSARParabolic(){
         if (firstDrawPoint > 0){
-            long i=0;
-            int x=0,ySAR=0;
+            int i=0,x=0,ySAR=0, yesterday=0, today=1, tomorrow=2;
             Double[] minYAndMaxY = _getMinAndMax(firstDrawPoint, graphSizeX);
             Double deltaY=(minYAndMaxY[1]-minYAndMaxY[0])*(1+graphYMarginRate);
             
             _drawScale(minYAndMaxY);
             
-            quote.Prices previousPrice = graphPrices.get(graphPrices.firstKey());
-            Double previousSAR=0.0, currentSAR=0.0,extremePoint=0.0
+            Double currentSAR=0.0
+                    , nextSAR=0.0
+                    , extremePoint=0.0
                     , accelerationFactor = 0.0
                     , initialAccelerationFactor=0.02
                     , accelerationFactorIncrease=0.02
-                    , accelerationFactorLimit = 0.2
-                    , previousAccelerationFactor=0.0;
-            boolean trendUp=true,accelerated=false;
+                    , accelerationFactorLimit = 0.2;
+            boolean upTrend=true, trendChange=false;
+            
+            
+            Prices[] SARPrices = new Prices[3];
+            
+            
             for(long  longTimeMillis: graphPrices.keySet()){
-                if (i++ >= firstDrawPoint) {
-                    
-                    if ((i-1) == firstDrawPoint){
-                        trendUp = ((graphPrices.get(longTimeMillis).getAdjClose()-previousPrice.getAdjClose()) > 0);
-                        currentSAR = trendUp ? previousPrice.getLow():previousPrice.getHigh();
-                        extremePoint = currentSAR;
+                SARPrices[0] = SARPrices[1];
+                SARPrices[1] = SARPrices[2];
+                SARPrices[2] = graphPrices.get(longTimeMillis);
+                
+                if ((i++ >= firstDrawPoint) && (SARPrices[SARPrices.length-1]!=null)) {
+                    if (extremePoint==0.0){ // first SAR point
+                        upTrend = (SARPrices[today].getClose() > SARPrices[yesterday].getClose());
                         accelerationFactor = initialAccelerationFactor;
-                        System.out.println("extremePoint:"+extremePoint);
+                        extremePoint = (upTrend) ? 
+                                          Math.max(SARPrices[yesterday].getHigh(),SARPrices[today].getHigh()) 
+                                        : Math.max(SARPrices[yesterday].getLow(),SARPrices[today].getLow());
+                        nextSAR = extremePoint ;
                     }
                     else {
-                        if (trendUp){
-                            if (graphPrices.get(longTimeMillis).getHigh() > extremePoint){
-                                extremePoint = graphPrices.get(longTimeMillis).getHigh();
-                                accelerationFactor +=accelerationFactorIncrease;
-                                accelerated = (accelerationFactor < accelerationFactorLimit);
-                                if (accelerationFactor > accelerationFactorLimit){
-                                    accelerationFactor = accelerationFactorLimit;
-                                }
-                            }
-                        }
-                        else {
-                            if (graphPrices.get(longTimeMillis).getLow() < extremePoint){
-                                extremePoint = graphPrices.get(longTimeMillis).getLow();
-                                accelerationFactor +=accelerationFactorIncrease;
-                                accelerated = (accelerationFactor < accelerationFactorLimit);
-                                if (accelerationFactor > accelerationFactorLimit){
-                                    accelerationFactor = accelerationFactorLimit;
-                                }
-                            }
-                        }
-                        currentSAR = previousSAR + accelerationFactor*(extremePoint-previousSAR);
                         
-                        if ( ((trendUp) && (currentSAR >= graphPrices.get(longTimeMillis).getLow())) 
-                          || ((!trendUp) && (currentSAR <= graphPrices.get(longTimeMillis).getHigh()))){
-                            if (accelerated){
-                                currentSAR = previousSAR + previousAccelerationFactor*(extremePoint-previousSAR);
-                                
-                                if ( ((trendUp) && (currentSAR >= graphPrices.get(longTimeMillis).getLow())) 
-                                 || ((!trendUp) && (currentSAR <= graphPrices.get(longTimeMillis).getHigh()))){
-                                    trendUp = !trendUp;
-                                    currentSAR = extremePoint;
-                                    accelerationFactor = initialAccelerationFactor;
-                                }
-                                else {
-                                    accelerationFactor = previousAccelerationFactor;
+                        nextSAR = currentSAR + accelerationFactor*(extremePoint-currentSAR);
+                        
+                        // check SAR is not within todays or yesterdays values
+                        if (!trendChange){
+                            if (upTrend){ 
+                                if (nextSAR > Math.min(SARPrices[yesterday].getLow(),SARPrices[today].getLow())){
+                                    nextSAR = Math.min(SARPrices[yesterday].getLow(),SARPrices[today].getLow());
                                 }
                             }
                             else {
-                                trendUp = !trendUp;
-                                currentSAR = (trendUp) ? Math.min(extremePoint,graphPrices.get(longTimeMillis).getLow()) : Math.max(extremePoint,graphPrices.get(longTimeMillis).getHigh());
-                                extremePoint = (trendUp) ? graphPrices.get(longTimeMillis).getHigh(): graphPrices.get(longTimeMillis).getLow();
+                                if ( nextSAR < Math.max(SARPrices[yesterday].getHigh(),SARPrices[today].getHigh()) ){
+                                    nextSAR = Math.max(SARPrices[yesterday].getHigh(),SARPrices[today].getHigh());
+                                }
+                            }
+                        }
+                            
+                        trendChange=false;
+                        // check switch trend
+                        if (upTrend){
+                            if (nextSAR > SARPrices[tomorrow].getLow()){
+                                trendChange=true;
+                                upTrend = !upTrend;
+                                extremePoint = Math.max(extremePoint, SARPrices[today].getHigh());
                                 accelerationFactor = initialAccelerationFactor;
+                                currentSAR = extremePoint;
+                                nextSAR = currentSAR + accelerationFactor*(extremePoint-currentSAR);
+                            }
+                        }
+                        else {
+                            if (SARPrices[tomorrow].getHigh() > nextSAR){
+                                trendChange=true;
+                                upTrend = !upTrend;
+                                extremePoint = Math.min(extremePoint, SARPrices[today].getLow());
+                                accelerationFactor = initialAccelerationFactor;
+                                currentSAR = extremePoint;
+                                nextSAR = currentSAR + accelerationFactor*(extremePoint-currentSAR);
+                            }
+                        }
+                        
+                        // Check new extreme point
+                        if (upTrend){
+                            if (SARPrices[today].getHigh() > extremePoint){
+                                extremePoint = SARPrices[today].getHigh();
+                                accelerationFactor = (accelerationFactor >= accelerationFactorLimit) ? 
+                                                                                           accelerationFactorLimit 
+                                                                                        : (accelerationFactor+accelerationFactorIncrease);
+                            }
+                        }
+                        else {
+                            if (SARPrices[today].getLow() < extremePoint){
+                                extremePoint = SARPrices[today].getLow();
+                                accelerationFactor = (accelerationFactor >= accelerationFactorLimit) ? 
+                                                                                           accelerationFactorLimit 
+                                                                                        : (accelerationFactor+accelerationFactorIncrease);
                             }
                         }
                     }
-                    previousSAR = currentSAR;
-                    previousAccelerationFactor = accelerationFactor;
-                    x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
-                    ySAR = (int) ((graphSizeY*(minYAndMaxY[1]-currentSAR)/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
                     
-                    g.setColor((trendUp) ? new Color(0,180,0) : new Color(180,0,0) ); 
+                    x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
+                    ySAR = (int) ((graphSizeY*(minYAndMaxY[1]-nextSAR)/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
+                    
+                    g.setColor((upTrend) ? new Color(0,180,0) : new Color(180,0,0) ); 
                     g.fillOval(x-1
                             , ySAR
-                            , 4
-                            , 4);
+                            , 5
+                            , 5);
                     
+                    currentSAR = nextSAR;
                 }
                 if ((i-firstDrawPoint) >= graphSizeX ) break;
-                previousPrice = graphPrices.get(longTimeMillis);
+
             }
         }
     }
@@ -275,6 +344,7 @@ public class PricesDraw {
                 previousCalendar.setTimeInMillis(graphPoint.getLongTimeMillis());
             }
             drawSARParabolic();
+            drawBollinger();
         }
     }
     
