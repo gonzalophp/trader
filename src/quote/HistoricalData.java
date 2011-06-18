@@ -19,41 +19,41 @@ public class HistoricalData {
     public static final int DAY=1;
     public static final int WEEK=2;
     
-    private HashMap<Integer, TreeMap<Long, quote.Prices>> _pricesDataPeriods;
+    private HashMap<Integer, TreeMap<Long, quote.Quote>> _quoteDataPeriods;
     private String ticket;
 
     public HistoricalData(){
-        _pricesDataPeriods = new HashMap<Integer, TreeMap<Long, quote.Prices>>();
+        _quoteDataPeriods = new HashMap<Integer, TreeMap<Long, quote.Quote>>();
     }
     
-    public void loadPrices(String ticket, quote.source.PriceReader priceReader){
-        if (this.ticket != ticket){
-            this.ticket = ticket;
-            _pricesDataPeriods.clear();
-            _pricesDataPeriods.put(ALL, priceReader.getPrices(ticket));
+    public void loadPrices(quote.Quote quote, quote.source.PriceReader priceReader){
+        if (this.ticket != quote.getTicket()){
+            this.ticket = quote.getTicket();
+            _quoteDataPeriods.clear();
+            _quoteDataPeriods.put(ALL, priceReader.getPrices(quote.getTicket()));
         }
     }
     
-    public TreeMap<Long, Prices> getPrices() throws Exception {
-        return getPrices(ALL);
+    public TreeMap<Long, quote.Quote> getQuotes() throws Exception {
+        return getQuotes(ALL);
     }
 
-    public TreeMap<Long, quote.Prices> getPrices(int period) throws Exception {
+    public TreeMap<Long, quote.Quote> getQuotes(int period) throws Exception {
         
         if (ticket.isEmpty()) {
             throw new Exception();
         }
         else {
             if (period==ALL){
-                return _pricesDataPeriods.get(ALL);
+                return _quoteDataPeriods.get(ALL);
             }
             else {
-                if (!_pricesDataPeriods.containsKey(period)){
-                    TreeMap<Long, quote.Prices> pricesData = new TreeMap<Long, quote.Prices>();
+                if (!_quoteDataPeriods.containsKey(period)){
+                    TreeMap<Long, quote.Quote> pricesData = new TreeMap<Long, quote.Quote>();
 
                     switch(period){
                         case DAY:
-                            Set<Long> setAllTimeMillis = _pricesDataPeriods.get(ALL).keySet();
+                            Set<Long> setAllTimeMillis = _quoteDataPeriods.get(ALL).keySet();
                             Iterator iAllTimeMillis = setAllTimeMillis.iterator();
                             Calendar calendar = Calendar.getInstance();
                             quote.Prices prices;
@@ -70,25 +70,25 @@ public class HistoricalData {
                                 prices = new quote.Prices();
                                 
                                 
-                                prices.setOpen(_pricesDataPeriods.get(ALL).get(timeMillis).getOpen());
-                                prices.setHigh(_pricesDataPeriods.get(ALL).get(timeMillis).getHigh());
-                                prices.setLow(_pricesDataPeriods.get(ALL).get(timeMillis).getLow());
-                                prices.setClose(_pricesDataPeriods.get(ALL).get(timeMillis).getClose());
-                                prices.setVolume(_pricesDataPeriods.get(ALL).get(timeMillis).getVolume());
-                                prices.setAdjClose(_pricesDataPeriods.get(ALL).get(timeMillis).getAdjClose());
-                
-                
-                                pricesData.put(calendar.getTimeInMillis(), prices);
+                                prices.setOpen(_quoteDataPeriods.get(ALL).get(timeMillis).getPrices().getOpen());
+                                prices.setHigh(_quoteDataPeriods.get(ALL).get(timeMillis).getPrices().getHigh());
+                                prices.setLow(_quoteDataPeriods.get(ALL).get(timeMillis).getPrices().getLow());
+                                prices.setClose(_quoteDataPeriods.get(ALL).get(timeMillis).getPrices().getClose());
+                                prices.setVolume(_quoteDataPeriods.get(ALL).get(timeMillis).getPrices().getVolume());
+                                prices.setAdjClose(_quoteDataPeriods.get(ALL).get(timeMillis).getPrices().getAdjClose());
+                                quote.Quote quote  = new quote.Quote(this.ticket);
+                                quote.setPrices(prices);
+                                pricesData.put(calendar.getTimeInMillis(), quote);
                             }
                             
-                            _pricesDataPeriods.put(DAY, pricesData);
+                            _quoteDataPeriods.put(DAY, pricesData);
                         break;
                     }
 
-                    _pricesDataPeriods.put(period, pricesData);
+                    _quoteDataPeriods.put(period, pricesData);
                 }
 
-                return _pricesDataPeriods.get(period);
+                return _quoteDataPeriods.get(period);
             }
         }
     }

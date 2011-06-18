@@ -20,7 +20,7 @@ import quote.Prices;
  * @author fiber
  */
 public class PricesDraw {
-    private TreeMap<Long, Prices> graphPrices;
+    private TreeMap<Long, quote.Quote> quotes;
     private final String[] monthName = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
     private final Double graphYMarginRate = 0.2; // 10% graph margin, both top and bottom -> 20%
     public static final int GRAPH_STYLE_LINE   = 1
@@ -30,16 +30,16 @@ public class PricesDraw {
     private Double scale;
     private long firstDrawPoint;
     
-    public PricesDraw(TreeMap<Long, Prices> graphPrices){
-        this.graphPrices = graphPrices;
+    public PricesDraw(TreeMap<Long, quote.Quote> quotes){
+        this.quotes = quotes;
     }
     
     public void setGraphStyle(int graphStyle){
         this.graphStyle = graphStyle;
     }
     
-    public TreeMap<Long, Prices> getGraphPrices() {
-        return graphPrices;
+    public TreeMap<Long, quote.Quote> getQuotes() {
+        return quotes;
     }
     
     public void draw(Graphics g
@@ -76,9 +76,9 @@ public class PricesDraw {
                 ,n=20,x,ySMA,yDeviationUp,yDeviationDown;
             Double deviationFactor = 2.0, SMA=0.0, deviation=0.0;
             HashMap<Integer,Double> indicatorPrices = new HashMap<Integer,Double>();
-            for(long  longTimeMillis: graphPrices.keySet()){
+            for(long  longTimeMillis: quotes.keySet()){
                 
-                indicatorPrices.put((i++ % n), graphPrices.get(longTimeMillis).getClose());
+                indicatorPrices.put((i++ % n), quotes.get(longTimeMillis).getPrices().getClose());
                 if (i >= firstDrawPoint) {
                     Double sum=0.0;
                     for (int key :indicatorPrices.keySet()){
@@ -132,10 +132,10 @@ public class PricesDraw {
             Prices[] SARPrices = new Prices[3];
             
             
-            for(long  longTimeMillis: graphPrices.keySet()){
+            for(long  longTimeMillis: quotes.keySet()){
                 SARPrices[0] = SARPrices[1];
                 SARPrices[1] = SARPrices[2];
-                SARPrices[2] = graphPrices.get(longTimeMillis);
+                SARPrices[2] = quotes.get(longTimeMillis).getPrices();
                 
                 if ((i++ >= firstDrawPoint) && (SARPrices[SARPrices.length-1]!=null)) {
                     if (extremePoint==0.0){ // first SAR point
@@ -233,10 +233,10 @@ public class PricesDraw {
             ArrayList<GraphPoint> alGraphPoints = new ArrayList<GraphPoint>();
             
             _drawScale(minYAndMaxY);
-            for(long  longTimeMillis: graphPrices.keySet()){
+            for(long  longTimeMillis: quotes.keySet()){
                 if (i++ >= firstDrawPoint) {
                     x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
-                    y = (int)((graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getAdjClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
+                    y = (int)((graphSizeY*(minYAndMaxY[1]-quotes.get(longTimeMillis).getPrices().getAdjClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2));
                     
                     alGraphPoints.add(new GraphPoint(longTimeMillis, x, y));
                 }
@@ -273,14 +273,14 @@ public class PricesDraw {
             ,maxY=0.0
             ,minY=0.0;
         int i=0;
-        for(long  longTimeMillis: graphPrices.keySet()){
+        for(long  longTimeMillis: quotes.keySet()){
                 if (i++ > firstDrawPoint) {
-                    minY = Math.min(minY, graphPrices.get(longTimeMillis).getAdjClose());
-                    maxY = Math.max(maxY, graphPrices.get(longTimeMillis).getAdjClose());
+                    minY = Math.min(minY, quotes.get(longTimeMillis).getPrices().getAdjClose());
+                    maxY = Math.max(maxY, quotes.get(longTimeMillis).getPrices().getAdjClose());
                 }
                 else if (i == firstDrawPoint) {
-                    minY = graphPrices.get(longTimeMillis).getAdjClose();
-                    maxY = graphPrices.get(longTimeMillis).getAdjClose();
+                    minY = quotes.get(longTimeMillis).getPrices().getAdjClose();
+                    maxY = quotes.get(longTimeMillis).getPrices().getAdjClose();
                 }
                 if ((i-firstDrawPoint) >= (graphSizeX) ) break;
             }
@@ -304,13 +304,13 @@ public class PricesDraw {
             
             _drawScale(minYAndMaxY);
             
-            for(long  longTimeMillis: graphPrices.keySet()){
+            for(long  longTimeMillis: quotes.keySet()){
                 if (i++ >= firstDrawPoint) {
                     x = (int)((i-firstDrawPoint)*(scale))+marginLeft;
-                    yHigh = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getHigh())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
-                    yLow = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getLow())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
-                    yOpen = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getOpen())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
-                    yClose = (graphSizeY*(minYAndMaxY[1]-graphPrices.get(longTimeMillis).getClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    yHigh = (graphSizeY*(minYAndMaxY[1]-quotes.get(longTimeMillis).getPrices().getHigh())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    yLow = (graphSizeY*(minYAndMaxY[1]-quotes.get(longTimeMillis).getPrices().getLow())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    yOpen = (graphSizeY*(minYAndMaxY[1]-quotes.get(longTimeMillis).getPrices().getOpen())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
+                    yClose = (graphSizeY*(minYAndMaxY[1]-quotes.get(longTimeMillis).getPrices().getClose())/deltaY)+marginTop+(graphSizeY*(graphYMarginRate)/2);
                     
                     alGraphPoints.add(new GraphPoint(longTimeMillis
                                                     ,x
@@ -370,14 +370,14 @@ public class PricesDraw {
         Double maxY=0.0
               ,minY=0.0;
         int i=0;
-        for(long  longTimeMillis: graphPrices.keySet()){
+        for(long  longTimeMillis: quotes.keySet()){
                 if (i++ > firstDrawPoint) {
-                    minY = Math.min(minY, graphPrices.get(longTimeMillis).getLow());
-                    maxY = Math.max(maxY, graphPrices.get(longTimeMillis).getHigh());
+                    minY = Math.min(minY, quotes.get(longTimeMillis).getPrices().getLow());
+                    maxY = Math.max(maxY, quotes.get(longTimeMillis).getPrices().getHigh());
                 }
                 else if (i == firstDrawPoint) {
-                    minY = graphPrices.get(longTimeMillis).getLow();
-                    maxY = graphPrices.get(longTimeMillis).getHigh();
+                    minY = quotes.get(longTimeMillis).getPrices().getLow();
+                    maxY = quotes.get(longTimeMillis).getPrices().getHigh();
                 }
                 if ((i-firstDrawPoint) >= (graphSizeX) ) break;
             }

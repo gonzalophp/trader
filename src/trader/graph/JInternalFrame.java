@@ -26,18 +26,18 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
         initComponents();
     }
     
-    public void drawQuote(String ticketQuote, quote.source.PriceReader dataSource){
-        this.setTitle(ticketQuote);
-        historicalData.loadPrices(ticketQuote, dataSource);
+    public void drawQuote(quote.Quote quote, quote.source.PriceReader dataSource){
+        this.setTitle(quote.getTicket());
+        historicalData.loadPrices(quote, dataSource);
         try {
             setVisible(true);
-            TreeMap<Long,quote.Prices> graphPrices = historicalData.getPrices(quote.HistoricalData.ALL);
-            jPanel1.setGraphPrices(graphPrices);
+            TreeMap<Long,quote.Quote> quotes = historicalData.getQuotes(historicalData.ALL);
+            jPanel1.setGraphPrices(quotes);
             jComboBox2.setSelectedItem("candlestick");
-            jScrollBar1.setValues(graphPrices.size()-jPanel1.getGraphSizeX()
+            jScrollBar1.setValues(quotes.size()-jPanel1.getGraphSizeX()
                                 , jPanel1.getGraphSizeX()
                                 , 1
-                                , graphPrices.size());
+                                , quotes.size());
         }
         catch(Exception e){
             System.out.println("Error getting prices");
@@ -180,10 +180,10 @@ public class JInternalFrame extends javax.swing.JInternalFrame {
 
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
         jPanel1.setGraphStyle(jComboBox2.getSelectedIndex()+1);
-        jScrollBar1.setValues(jPanel1.getPricesDraw().getGraphPrices().size()-jPanel1.getGraphSizeX()
+        jScrollBar1.setValues(jPanel1.getPricesDraw().getQuotes().size()-jPanel1.getGraphSizeX()
                                 , jPanel1.getGraphSizeX()
                                 , 1
-                                , jPanel1.getPricesDraw().getGraphPrices().size());
+                                , jPanel1.getPricesDraw().getQuotes().size());
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

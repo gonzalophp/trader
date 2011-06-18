@@ -205,7 +205,9 @@ public class TraderView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        jInternalFrame1.drawQuote("SHP.L",new quote.source.Yahoo());
+        quote.Quote quote = new quote.Quote("SHP.L");
+        
+        jInternalFrame1.drawQuote(quote, new quote.source.Yahoo());
         
         
         jInternalFrame1 = new trader.graph.JInternalFrame();

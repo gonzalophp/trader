@@ -11,5 +11,5 @@ import java.util.TreeMap;
  * @author fiber
  */
 public interface PriceReader {
-    public TreeMap<Long, quote.Prices> getPrices(String ticket);
+    public TreeMap<Long, quote.Quote> getPrices(String ticket);
 }

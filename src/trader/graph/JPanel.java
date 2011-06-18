@@ -51,10 +51,10 @@ public class JPanel extends javax.swing.JPanel {
         }
     }
     
-    public void setGraphPrices(TreeMap<Long, Prices> graphPrices){
+    public void setGraphPrices(TreeMap<Long, quote.Quote> quotes){
         jInternalFrame1 = (trader.graph.JInternalFrame)getParentObject(this,"trader.graph.JInternalFrame");
         dataSet = true;
-        pricesDraw = new PricesDraw(graphPrices);
+        pricesDraw = new PricesDraw(quotes);
     }
 
     public PricesDraw getPricesDraw() {
@@ -66,11 +66,11 @@ public class JPanel extends javax.swing.JPanel {
         switch (graphStyle) {
             case PricesDraw.GRAPH_STYLE_LINE:
                 scale = 1.0;
-                firstDrawPoint = pricesDraw.getGraphPrices().size() - getGraphSizeX();
+                firstDrawPoint = pricesDraw.getQuotes().size() - getGraphSizeX();
             break;
             case PricesDraw.GRAPH_STYLE_CANDLESTICK:
                 scale = 3.0;
-                firstDrawPoint = pricesDraw.getGraphPrices().size() - getGraphSizeX();
+                firstDrawPoint = pricesDraw.getQuotes().size() - getGraphSizeX();
             break;
         }
     }
@@ -95,7 +95,7 @@ public class JPanel extends javax.swing.JPanel {
     public int zoomMinus(){
         int graphSizeX = getGraphSizeX();
         if (firstDrawPoint < graphSizeX){
-            scale = new Double(getWidth()-MARGIN_LEFT-MARGIN_RIGHT)/(pricesDraw.getGraphPrices().size());
+            scale = new Double(getWidth()-MARGIN_LEFT-MARGIN_RIGHT)/(pricesDraw.getQuotes().size());
             firstDrawPoint = 1;
         }
         else {
@@ -170,8 +170,8 @@ public class JPanel extends javax.swing.JPanel {
     private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
             int newFirstDrawPoint = firstDrawPoint+lastMouseDragX-evt.getX();
             
-            if ((newFirstDrawPoint+getGraphSizeX())>pricesDraw.getGraphPrices().size()){
-                newFirstDrawPoint = pricesDraw.getGraphPrices().size()-getGraphSizeX();
+            if ((newFirstDrawPoint+getGraphSizeX())>pricesDraw.getQuotes().size()){
+                newFirstDrawPoint = pricesDraw.getQuotes().size()-getGraphSizeX();
             }
             if ((firstDrawPoint != newFirstDrawPoint) &&(newFirstDrawPoint>1)){
                 lastMouseDragX = evt.getX();
@@ -184,7 +184,7 @@ private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRS
     if (scaleDraw != null){
         trader.graph.JPanel jPanelAux = (trader.graph.JPanel)evt.getComponent();
         scaleDraw.setDimension((int)(jPanelAux.getGraphSizeX()*scale), jPanelAux.getGraphSixeY());
-        firstDrawPoint = pricesDraw.getGraphPrices().size()-jPanelAux.getGraphSizeX();
+        firstDrawPoint = pricesDraw.getQuotes().size()-jPanelAux.getGraphSizeX();
     }
 }//GEN-LAST:event_formComponentResized
 

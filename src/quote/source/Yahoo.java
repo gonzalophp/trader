@@ -19,8 +19,8 @@ import java.util.TreeMap;
  */
 public class Yahoo implements PriceReader {
     
-    public TreeMap<Long, quote.Prices> getPrices(String ticket){
-        TreeMap<Long, quote.Prices> historicalData = new TreeMap<Long, quote.Prices>();
+    public TreeMap<Long, quote.Quote> getPrices(String ticket){
+        TreeMap<Long, quote.Quote> historicalData = new TreeMap<Long, quote.Quote>();
         quote.Prices prices;
         
         Calendar calendar = Calendar.getInstance();
@@ -54,7 +54,9 @@ public class Yahoo implements PriceReader {
                 prices.setVolume(Long.parseLong(nextLineValues[5]));
                 prices.setAdjClose(Double.parseDouble(nextLineValues[6]));
                 
-                historicalData.put(calendar.getTimeInMillis(), prices);
+                quote.Quote quote = new quote.Quote(ticket);
+                quote.setPrices(prices);
+                historicalData.put(calendar.getTimeInMillis(), quote);
             }
         } catch(MalformedURLException e){
             System.out.println("Please check the URL:" + e.toString() );
